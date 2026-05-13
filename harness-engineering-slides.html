@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Harness Engineering: The AI Control Plane — Elastic</title>
+<style>
+:root {
+  --bg:       #0D1117;
+  --surf:     #161B22;
+  --surf2:    #1E2530;
+  --surf3:    #252D3A;
+  --border:   #2D3748;
+  --blue:     #0B64DD;
+  --blue-lt:  #3B8EFF;
+  --cyan:     #48EFCF;
+  --amber:    #FEC514;
+  --pink:     #F04E98;
+  --green:    #27AE60;
+  --ink:      #FFFFFF;
+  --ink2:     #DCE2EA;
+  --ink3:     #8B9CB0;
+  --ink4:     #5A6880;
+  --dark-ink: #1C1E23;
+  --body-ink: #343741;
+  --font: 'Inter','Segoe UI',system-ui,sans-serif;
+  --mono: 'JetBrains Mono','Fira Code','Consolas',monospace;
+  --W: 1920px;
+  --H: 1080px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:#050810;
+  font-family:var(--font);
+  color:var(--ink);
+  overflow:hidden;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+#wrap{width:100vw;height:100vh;display:flex;align-items:center;justify-content:center}
+#deck{width:var(--W);height:var(--H);transform-origin:center center;position:relative}
+
+/* ── slides ── */
+.slide{position:absolute;inset:0;display:none;background:var(--bg);overflow:hidden}
+.slide.active{display:flex;flex-direction:column}
+
+/* ── shared typography ── */
+.label{font-size:17px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--cyan);margin-bottom:14px}
+.hdg1{font-size:72px;font-weight:900;line-height:1.0;color:var(--ink)}
+.hdg2{font-size:52px;font-weight:800;line-height:1.05;color:var(--ink)}
+.hdg3{font-size:38px;font-weight:700;line-height:1.1;color:var(--ink)}
+.sub {font-size:22px;line-height:1.55;color:var(--ink3);margin-top:14px}
+.hdr{padding:48px 80px 30px;border-bottom:1px solid var(--border);flex-shrink:0}
+.body{flex:1;padding:40px 80px 36px;display:flex;gap:36px;overflow:hidden}
+
+/* ── badge ── */
+.badge{display:inline-flex;align-items:center;padding:5px 16px;border-radius:20px;font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.b-blue {background:rgba(11,100,221,.18);color:var(--blue-lt);border:1px solid rgba(11,100,221,.4)}
+.b-cyan {background:rgba(72,239,207,.1);color:var(--cyan);border:1px solid rgba(72,239,207,.3)}
+.b-amber{background:rgba(254,197,20,.12);color:var(--amber);border:1px solid rgba(254,197,20,.3)}
+.b-pink {background:rgba(240,78,152,.12);color:var(--pink);border:1px solid rgba(240,78,152,.3)}
+.b-green{background:rgba(39,174,96,.14);color:#4ADE80;border:1px solid rgba(39,174,96,.3)}
+
+/* ── card ── */
+.card{background:var(--surf);border:1px solid var(--border);border-radius:14px;padding:28px 30px;display:flex;flex-direction:column;gap:14px}
+.card.dark2{background:var(--surf2)}
+.card.dark3{background:var(--surf3)}
+.card-h{font-size:20px;font-weight:700;display:flex;align-items:center;gap:10px}
+.card-b{font-size:17px;line-height:1.65;color:var(--ink3)}
+.card-b strong{color:var(--ink)}
+
+/* ── alert ── */
+.alert{border-radius:10px;padding:16px 22px;font-size:19px;font-weight:500;line-height:1.45;display:flex;gap:14px;flex-shrink:0}
+.a-blue  {background:rgba(11,100,221,.1);border:1px solid rgba(11,100,221,.4);color:#90C0FF}
+.a-amber {background:rgba(254,197,20,.1);border:1px solid rgba(254,197,20,.3);color:#F5D478}
+.a-pink  {background:rgba(240,78,152,.1);border:1px solid rgba(240,78,152,.3);color:#FFB0D0}
+.a-cyan  {background:rgba(72,239,207,.08);border:1px solid rgba(72,239,207,.25);color:var(--cyan)}
+.a-icon  {font-size:22px;flex-shrink:0;margin-top:2px}
+
+/* ── code ── */
+pre,code{font-family:var(--mono)}
+pre{background:#080C12;border:1px solid var(--border);border-radius:10px;padding:18px 22px;font-size:15px;line-height:1.7;color:#CDD6F4;overflow:auto;white-space:pre}
+.cm{color:#4A5568}.kw{color:#89B4FA}.st{color:#A6E3A1}.num{color:#FAB387}
+.ok{color:#4ADE80;font-weight:700}.warn{color:var(--amber);font-weight:700}.err{color:#FF6B6B;font-weight:700}
+.cy{color:var(--cyan)}.pk{color:var(--pink)}.am{color:var(--amber)}
+
+/* ── col helpers ── */
+.col{display:flex;flex-direction:column;gap:18px;flex:1}
+
+/* ── step list ── */
+.steps{display:flex;flex-direction:column;gap:16px}
+.step{display:flex;gap:16px;align-items:flex-start}
+.sn{width:32px;height:32px;border-radius:50%;background:var(--blue);color:#fff;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:3px}
+.st-t{font-size:18px;line-height:1.6;color:var(--ink3)}
+.st-t strong{color:var(--ink)}
+
+/* ── nav ── */
+#nav{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:14px;background:rgba(22,27,34,.94);backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:40px;padding:9px 22px;z-index:9999}
+#nav button{background:none;border:1px solid var(--border);color:var(--ink3);border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+#nav button:hover:not(:disabled){background:var(--blue);border-color:var(--blue);color:#fff}
+#nav button:disabled{opacity:.28;cursor:default}
+#ctr{font-size:14px;font-weight:600;color:var(--ink3);min-width:64px;text-align:center}
+.pips{display:flex;gap:5px;align-items:center}
+.pip{width:7px;height:7px;border-radius:50%;background:var(--border);cursor:pointer;transition:all .2s;flex-shrink:0}
+.pip.active{background:var(--cyan);width:20px;border-radius:3px}
+
+/* ══════════════════════════════════════════════════
+   SLIDE-SPECIFIC STYLES
+══════════════════════════════════════════════════ */
+
+/* S1 Title */
+#s1{background:linear-gradient(135deg,#080E1C 0%,#0A1835 55%,#080E1C 100%)}
+#s1 .hero{flex:1;padding:0 110px;display:flex;flex-direction:column;justify-content:center;gap:28px}
+#s1 .eyebrow{font-size:19px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan)}
+#s1 h1{font-size:88px;font-weight:900;line-height:.98;color:var(--ink)}
+#s1 h1 em{color:var(--blue-lt);font-style:normal}
+#s1 .tagline{font-size:28px;color:var(--ink2);max-width:920px;line-height:1.5}
+#s1 .divider{width:160px;height:4px;background:linear-gradient(90deg,var(--blue),var(--cyan));border-radius:2px}
+#s1 .tags{display:flex;gap:12px;flex-wrap:wrap}
+#s1 .src{font-size:15px;color:var(--ink4);margin-top:8px}
+#s1 .bar{height:5px;background:linear-gradient(90deg,var(--blue) 0%,var(--cyan) 50%,var(--blue) 100%);flex-shrink:0}
+
+/* S2 Agent Equation */
+.eq-split{flex:1;display:flex;gap:0;align-items:stretch}
+.eq-half{flex:1;padding:32px 36px;display:flex;flex-direction:column;gap:18px}
+.eq-half.left{background:rgba(240,78,152,.06);border-right:1px solid var(--border)}
+.eq-half.right{background:rgba(11,100,221,.07)}
+.eq-op{width:100px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:72px;font-weight:900;color:var(--cyan)}
+.eq-label{font-size:20px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.bullet-list{display:flex;flex-direction:column;gap:8px}
+.bullet-list li{font-size:17px;color:var(--ink3);list-style:none;padding-left:16px;position:relative;line-height:1.5}
+.bullet-list li::before{content:'·';position:absolute;left:0;color:var(--ink4)}
+
+/* S3 Anatomy layers */
+.layer-stack{flex:1;display:flex;flex-direction:column;gap:10px}
+.layer{border-radius:10px;padding:16px 24px;display:flex;align-items:center;gap:20px}
+.layer-name{font-size:16px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;flex-shrink:0;width:220px}
+.layer-desc{font-size:16px;color:var(--ink3);line-height:1.4}
+.layer-es{background:linear-gradient(90deg,rgba(11,100,221,.25),rgba(72,239,207,.15));border:1px solid rgba(72,239,207,.35);margin-top:4px}
+.layer-es .layer-name{color:var(--cyan);width:auto;margin-right:20px}
+
+/* S4 Flight Computer */
+.fc-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:22px;flex:1}
+.fc-card{background:var(--surf);border:1px solid var(--border);border-radius:14px;padding:26px 28px;display:flex;flex-direction:column;gap:12px}
+.fc-icon{font-size:36px}
+.fc-title{font-size:21px;font-weight:700}
+.fc-body{font-size:16px;color:var(--ink3);line-height:1.6}
+.vs-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;flex:1}
+.vs-card{border-radius:12px;padding:22px 26px;display:flex;flex-direction:column;gap:12px}
+.vs-card.bad{background:rgba(240,78,152,.07);border:1px solid rgba(240,78,152,.3)}
+.vs-card.good{background:rgba(11,100,221,.07);border:1px solid rgba(11,100,221,.4)}
+
+/* S5 Stack */
+.stack-layers{flex:1;display:flex;flex-direction:column;justify-content:center;gap:0}
+.stack-lyr{padding:18px 28px;display:flex;align-items:center;gap:20px;border-radius:10px;margin-bottom:8px}
+.stack-name{font-size:16px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;flex-shrink:0;width:220px}
+.stack-desc{font-size:15px;color:var(--ink3);line-height:1.4}
+.stack-arrow{text-align:center;font-size:20px;color:var(--ink4);margin:2px 0 10px}
+
+/* S6 Ratchet */
+.ratchet-list{flex:1;display:flex;flex-direction:column;gap:16px;justify-content:center}
+.ratchet-row{display:grid;grid-template-columns:1fr 60px 1fr;gap:0;align-items:center}
+.r-cause{background:rgba(240,78,152,.08);border:1px solid rgba(240,78,152,.25);border-radius:10px;padding:16px 20px}
+.r-cause-label{font-size:14px;font-weight:700;color:var(--pink);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.r-cause-text{font-size:16px;color:var(--ink3);line-height:1.5}
+.r-arrow{text-align:center;font-size:28px;color:var(--cyan)}
+.r-rule{background:rgba(11,100,221,.08);border:1px solid rgba(11,100,221,.35);border-radius:10px;padding:16px 20px}
+.r-rule-label{font-size:14px;font-weight:700;color:var(--blue-lt);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.r-rule-text{font-size:16px;color:var(--ink3);line-height:1.5}
+
+/* S7 Context */
+.ctx-steps{flex:1;display:flex;gap:18px}
+.ctx-step{flex:1;background:var(--surf);border:1px solid var(--border);border-radius:14px;padding:26px 24px;display:flex;flex-direction:column;gap:14px}
+.ctx-num{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;flex-shrink:0}
+.ctx-title{font-size:20px;font-weight:700}
+.ctx-body{font-size:16px;color:var(--ink3);line-height:1.65}
+
+/* S8 Agent Builder */
+.ab-grid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:20px;flex:1}
+.ab-card{background:var(--surf);border:1px solid var(--border);border-radius:14px;padding:22px 26px;display:flex;flex-direction:column;gap:10px}
+.ab-title{font-size:19px;font-weight:700;color:var(--blue-lt)}
+.ab-body{font-size:16px;color:var(--ink3);line-height:1.6}
+.ab-tag{display:inline-block;background:rgba(11,100,221,.15);color:var(--blue-lt);font-size:12px;font-weight:700;padding:3px 10px;border-radius:6px;font-family:var(--mono)}
+
+/* S9 Loop */
+.loop-wrap{display:flex;gap:36px;flex:1;align-items:stretch}
+.loop-diagram{flex:0 0 380px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;background:var(--surf);border:1px solid var(--border);border-radius:16px;padding:28px}
+.loop-node{width:200px;border-radius:12px;padding:18px 20px;text-align:center}
+.loop-node h3{font-size:22px;font-weight:800;margin-bottom:6px}
+.loop-node p{font-size:14px;color:var(--ink3);line-height:1.4}
+.loop-arrow{font-size:36px;color:var(--cyan);margin:4px 0}
+.loop-cycle{font-size:64px;color:var(--cyan);margin:8px 0}
+.hooks-col{flex:1;display:flex;flex-direction:column;gap:16px}
+.hook-item{background:var(--surf);border-left:3px solid var(--pink);border-radius:0 10px 10px 0;padding:14px 20px;display:flex;gap:14px;align-items:flex-start}
+.hook-when{font-size:13px;font-weight:700;color:var(--pink);letter-spacing:.07em;text-transform:uppercase;white-space:nowrap;margin-top:2px;min-width:140px}
+.hook-what{font-size:16px;color:var(--ink3);line-height:1.5}
+.hook-what strong{color:var(--ink)}
+
+/* S10 Convergence */
+.conv-top{display:flex;gap:16px;justify-content:center;margin-bottom:10px}
+.model-box{background:var(--surf);border:1px solid var(--border);border-radius:12px;padding:16px 24px;text-align:center;min-width:180px}
+.model-box .name{font-size:16px;font-weight:700}
+.model-box .by{font-size:13px;color:var(--ink3);margin-top:4px}
+.conv-arrow-row{display:flex;gap:16px;justify-content:center;margin-bottom:8px}
+.conv-down{font-size:28px;color:var(--cyan);flex:1;text-align:center}
+.conv-harness{background:linear-gradient(90deg,rgba(72,239,207,.1),rgba(11,100,221,.12));border:1px solid rgba(72,239,207,.35);border-radius:14px;padding:22px 32px;margin-bottom:16px}
+.conv-harness h3{font-size:22px;font-weight:800;color:var(--cyan);margin-bottom:8px}
+.conv-harness p{font-size:16px;color:var(--ink3);line-height:1.5}
+.conv-bottom{display:grid;grid-template-columns:1fr 1fr;gap:20px;flex:1}
+.conv-half{border-radius:12px;padding:20px 24px}
+.conv-half.diverge{background:rgba(240,78,152,.07);border:1px solid rgba(240,78,152,.25)}
+.conv-half.converge{background:var(--surf);border:1px solid var(--border)}
+
+/* S11 Maturity */
+.maturity-row{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;flex:1}
+.mat-card{border-radius:14px;padding:24px 22px;display:flex;flex-direction:column;gap:14px;border:1px solid var(--border)}
+.mat-lvl{font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px}
+.mat-title{font-size:20px;font-weight:700}
+
+/* S12/S13 image slides */
+.img-slide{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.img-slide img{width:100%;height:100%;object-fit:contain}
+.img-caption{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.85));padding:28px 48px 32px;font-size:18px;color:var(--ink3)}
+
+/* S14 Security & O11y */
+.domains{display:grid;grid-template-columns:1fr 1fr;gap:28px;flex:1}
+.domain{background:var(--surf);border:1px solid var(--border);border-radius:14px;padding:24px 26px;display:flex;flex-direction:column;gap:14px}
+.domain-title{font-size:20px;font-weight:800;margin-bottom:4px}
+.agent-row{display:flex;flex-direction:column;gap:10px}
+.agent-item{background:var(--surf2);border-radius:10px;padding:12px 16px}
+.agent-name{font-size:15px;font-weight:700;color:var(--blue-lt);margin-bottom:4px}
+.agent-harness{font-size:14px;color:var(--ink3);line-height:1.5}
+
+/* S15 Comparison table */
+.comp-wrap{flex:1;overflow:hidden;display:flex;flex-direction:column;gap:16px}
+.comp-table{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1.2fr;border:1px solid var(--border);border-radius:12px;overflow:hidden;flex:1;min-width:0}
+.ct-head{background:var(--surf2);padding:14px 14px;font-size:13px;font-weight:700;color:var(--ink3);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.3;min-height:52px}
+.ct-head:first-child{justify-content:flex-start;text-align:left}
+.ct-head.hl{color:var(--cyan)}
+.ct-row-label{padding:12px 14px;font-size:14px;color:var(--ink3);border-bottom:1px solid var(--border);display:flex;align-items:center;background:rgba(255,255,255,.02);font-weight:500}
+.ct-cell{padding:10px 12px;font-size:13px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.35}
+.ct-cell.hl{background:rgba(11,100,221,.07)}
+.ct-cell.good{color:#4ADE80}
+.ct-cell.ok{color:var(--amber)}
+.ct-cell.bad{color:#FF6B6B}
+.ct-cell.best{color:var(--cyan);font-weight:700}
+
+/* S16 Closing */
+#s16{background:linear-gradient(135deg,#080E1C 0%,#0A1835 60%,#080E1C 100%)}
+#s16 .hero{flex:1;padding:0 110px;display:flex;flex-direction:column;justify-content:center;gap:28px}
+#s16 h1{font-size:88px;font-weight:900;color:var(--ink);line-height:1.0}
+#s16 .sub2{font-size:28px;color:var(--cyan);margin-bottom:10px}
+#s16 .links{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+#s16 .link-item{font-size:18px;color:var(--ink3);font-family:var(--mono)}
+#s16 .link-item span{color:var(--blue-lt)}
+#s16 .bar{height:5px;background:linear-gradient(90deg,var(--blue) 0%,var(--cyan) 50%,var(--blue) 100%);flex-shrink:0}
+</style>
+</head>
+<body>
+<div id="wrap">
+<div id="deck">
+
+<!-- ══ S1: TITLE ══════════════════════════════════════════════════════════ -->
+<div class="slide active" id="s1">
+  <div class="hero">
+    <div class="eyebrow">Elastic · AI Agent Infrastructure</div>
+    <h1>Harness<br>Engineering<br><em>The AI Control Plane</em></h1>
+    <div class="divider"></div>
+    <p class="tagline">Elasticsearch drives the LLM Agent Harness. Elastic is the flight computer that lets you drive LLM agents with confidence.</p>
+    <div class="tags">
+      <span class="badge b-blue">Agent Builder</span>
+      <span class="badge b-cyan">Context Engineering</span>
+      <span class="badge b-amber">Harness Patterns</span>
+      <span class="badge b-pink">ReAct + Hooks</span>
+    </div>
+    <div class="src">May 2026 · Sources: Elastic, Addy Osmani, Viv Trivedy, Anthropic, Martin Fowler</div>
+  </div>
+  <div class="bar"></div>
+</div>
+
+<!-- ══ S2: AGENT EQUATION ════════════════════════════════════════════════ -->
+<div class="slide" id="s2">
+  <div class="hdr">
+    <div class="label">The Foundational Insight</div>
+    <div class="hdg2">Agent = Model + Harness</div>
+    <p class="sub">A raw model is not an agent. It becomes one only when a harness gives it state, tools, feedback loops, and enforceable constraints.</p>
+  </div>
+  <div class="eq-split">
+    <div class="eq-half left">
+      <div class="eq-label" style="color:var(--pink)">The Model</div>
+      <ul class="bullet-list">
+        <li>LLM weights &amp; inference</li>
+        <li>Pre-trained knowledge</li>
+        <li>Token generation</li>
+        <li style="color:var(--pink)">No persistent state</li>
+        <li style="color:var(--pink)">No tool execution</li>
+        <li style="color:var(--pink)">No memory</li>
+        <li style="color:var(--pink)">No constraints</li>
+      </ul>
+    </div>
+    <div class="eq-op">+</div>
+    <div class="eq-half right">
+      <div class="eq-label" style="color:var(--blue-lt)">The Harness</div>
+      <ul class="bullet-list">
+        <li>System prompts &amp; AGENTS.md</li>
+        <li>Tools, skills, MCP servers</li>
+        <li>Filesystem &amp; sandbox</li>
+        <li>Orchestration &amp; subagents</li>
+        <li>Hooks &amp; guardrails</li>
+        <li>Observability &amp; memory</li>
+        <li>Context engineering</li>
+      </ul>
+    </div>
+    <div class="eq-op" style="color:var(--cyan)">=</div>
+    <div class="eq-half" style="background:rgba(72,239,207,.05);border-left:1px solid var(--border);justify-content:center;gap:24px">
+      <div class="eq-label" style="color:var(--cyan)">The Agent</div>
+      <div style="font-size:36px;font-weight:900;color:var(--ink);line-height:1.1">Trusted.<br>Capable.<br>Auditable.</div>
+      <div class="alert a-cyan" style="margin-top:auto">
+        <span class="a-icon">💬</span>
+        <div style="font-size:17px"><em>"A decent model with a great harness beats a great model with a bad harness."</em><br><span style="color:var(--ink4);font-size:15px">— Addy Osmani, Google</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ S3: ANATOMY ════════════════════════════════════════════════════════ -->
+<div class="slide" id="s3">
+  <div class="hdr">
+    <div class="label">Architecture</div>
+    <div class="hdg2">Anatomy of an Agent Harness</div>
+    <p class="sub">Six interlocking layers — Elasticsearch powers the engine underneath them all.</p>
+  </div>
+  <div class="body" style="flex-direction:column;gap:12px;padding-top:28px">
+    <div class="layer-stack">
+      <div class="layer" style="background:rgba(255,255,255,.04);border:1px solid var(--border)">
+        <div class="layer-name" style="color:var(--ink)">Tools &amp; Skills</div>
+        <div class="layer-desc">ES|QL tools, MCP servers, search, bash, code execution — <strong style="color:var(--ink)">the agent's hands</strong></div>
+      </div>
+      <div class="layer" style="background:rgba(72,239,207,.05);border:1px solid rgba(72,239,207,.2)">
+        <div class="layer-name" style="color:var(--cyan)">Prompts &amp; Rules</div>
+        <div class="layer-desc">System prompts, AGENTS.md, skill files, subagent instructions — <strong style="color:var(--cyan)">the agent's brain</strong></div>
+      </div>
+      <div class="layer" style="background:rgba(72,239,207,.04);border:1px solid rgba(72,239,207,.15)">
+        <div class="layer-name" style="color:var(--cyan)">Context &amp; Memory</div>
+        <div class="layer-desc">Context injection, memory files, RAG retrieval, session persistence — <strong style="color:var(--cyan)">the agent's knowledge</strong></div>
+      </div>
+      <div class="layer" style="background:rgba(11,100,221,.06);border:1px solid rgba(11,100,221,.25)">
+        <div class="layer-name" style="color:var(--blue-lt)">Sandbox &amp; Runtime</div>
+        <div class="layer-desc">Isolated execution, filesystem, browser, dependencies — <strong style="color:var(--blue-lt)">where the agent works</strong></div>
+      </div>
+      <div class="layer" style="background:rgba(11,100,221,.05);border:1px solid rgba(11,100,221,.2)">
+        <div class="layer-name" style="color:var(--blue-lt)">Hooks &amp; Guardrails</div>
+        <div class="layer-desc">Pre-commit checks, typecheck, lint, block destructive commands, human-in-the-loop gates</div>
+      </div>
+      <div class="layer" style="background:rgba(11,100,221,.04);border:1px solid rgba(11,100,221,.18)">
+        <div class="layer-name" style="color:var(--blue-lt)">Orchestration</div>
+        <div class="layer-desc">Subagent spawning, handoffs, model routing, ReAct loops — <strong style="color:var(--blue-lt)">the control flow</strong></div>
+      </div>
+      <div class="layer layer-es">
+        <div class="layer-name" style="font-size:17px">⚡ Elasticsearch — The Engine Underneath</div>
+        <div class="layer-desc" style="color:var(--ink2)">Unified data store · Hybrid search + semantic reranking · ES|QL tools · RBAC + field-level security · Inference API · Observability &amp; tracing</div>
+      </div>
+    </div>
+    <div class="alert a-cyan" style="flex-shrink:0">
+      <span class="a-icon">💬</span>
+      <div style="font-size:17px"><em>"If you're not the model, you're the harness."</em> — Viv Trivedy &nbsp;·&nbsp; <em>"Agents are systems that run tools in a loop. The skill is in designing both the tools and the loop."</em> — Simon Willison</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ S4: FLIGHT COMPUTER ════════════════════════════════════════════════ -->
+<div class="slide" id="s4">
+  <div class="hdr">
+    <div class="label">Core Positioning</div>
+    <div class="hdg2">Elastic Is the Flight Computer</div>
+    <p class="sub">LLM agents need a control plane — Elasticsearch provides the navigation, guidance, and guardrails that turn raw models into trusted agents.</p>
+  </div>
+  <div class="body" style="flex-direction:column;gap:22px">
+    <div class="fc-grid">
+      <div class="fc-card" style="border-color:rgba(72,239,207,.3)">
+        <div class="fc-icon">🧭</div>
+        <div class="fc-title" style="color:var(--cyan)">Navigator</div>
+        <div class="fc-body">Directs the agent to the right data. Index explorer finds correct indices. Hybrid search + reranking delivers precise context — not noise.</div>
+      </div>
+      <div class="fc-card" style="border-color:rgba(11,100,221,.4)">
+        <div class="fc-icon">🎮</div>
+        <div class="fc-title" style="color:var(--blue-lt)">Controller</div>
+        <div class="fc-body">Hooks enforce rules. RBAC limits access. Workflows execute deterministic actions. Human-in-the-loop gates prevent drift.</div>
+      </div>
+      <div class="fc-card" style="border-color:rgba(254,197,20,.3)">
+        <div class="fc-icon">📊</div>
+        <div class="fc-title" style="color:var(--amber)">Confidence</div>
+        <div class="fc-body">Reasoning traces, observability, cost metering, evaluation metrics. Every decision is auditable. Every output is measurable.</div>
+      </div>
+    </div>
+    <div class="vs-grid">
+      <div class="vs-card bad">
+        <div style="font-size:16px;font-weight:700;color:var(--pink);margin-bottom:8px">❌ Without the Flight Computer</div>
+        <ul class="bullet-list" style="gap:7px">
+          <li style="color:#FFB0D0">Agent searches wrong indices</li>
+          <li style="color:#FFB0D0">Hallucinates answers from noise</li>
+          <li style="color:#FFB0D0">No permission enforcement</li>
+          <li style="color:#FFB0D0">No audit trail</li>
+          <li style="color:#FFB0D0">Unpredictable tool execution</li>
+          <li style="color:#FFB0D0">Context window overload</li>
+        </ul>
+      </div>
+      <div class="vs-card good">
+        <div style="font-size:16px;font-weight:700;color:var(--blue-lt);margin-bottom:8px">✅ With Elasticsearch</div>
+        <ul class="bullet-list" style="gap:7px">
+          <li style="color:#90C0FF">Precise retrieval from correct indices</li>
+          <li style="color:#90C0FF">Answers grounded in your data</li>
+          <li style="color:#90C0FF">RBAC + field-level security</li>
+          <li style="color:#90C0FF">Full reasoning traces</li>
+          <li style="color:#90C0FF">Controlled tool execution</li>
+          <li style="color:#90C0FF">Compaction + progressive disclosure</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ S5: ES DRIVES THE HARNESS ════════════════════════════════════════ -->
+<div class="slide" id="s5">
+  <div class="hdr">
+    <div class="label">Architecture</div>
+    <div class="hdg2">Elasticsearch Drives the Agent Harness</div>
+    <p class="sub">The harness stack — Elasticsearch provides the foundation for every layer, from data storage to agent orchestration.</p>
+  </div>
+  <div class="body">
+    <div class="col" style="flex:1.2;justify-content:center">
+      <div class="stack-layers">
+        <div class="stack-lyr" style="background:rgba(255,255,255,.04);border:1px solid var(--border)">
+          <div class="stack-name" style="color:var(--ink)">Agent Layer</div>
+          <div class="stack-desc">Custom agents, chat interface, API / MCP / A2A integration</div>
+        </div>
+        <div class="stack-arrow">▲ built on</div>
+        <div class="stack-lyr" style="background:rgba(11,100,221,.06);border:1px solid rgba(11,100,221,.2)">
+          <div class="stack-name" style="color:var(--blue-lt)">Orchestration Layer</div>
+          <div class="stack-desc">Workflows, subagents, ReAct loops, hooks, human-in-the-loop</div>
+        </div>
+        <div class="stack-arrow">▲ built on</div>
+        <div class="stack-lyr" style="background:rgba(11,100,221,.09);border:1px solid rgba(11,100,221,.3)">
+          <div class="stack-name" style="color:var(--blue-lt)">Tools Layer</div>
+          <div class="stack-desc">Custom ES|QL tools, built-in search, MCP servers, index explorer</div>
+        </div>
+        <div class="stack-arrow">▲ built on</div>
+        <div class="stack-lyr" style="background:linear-gradient(90deg,rgba(72,239,207,.12),rgba(11,100,221,.12));border:1px solid rgba(72,239,207,.35)">
+          <div class="stack-name" style="color:var(--cyan)">Data Foundation</div>
+          <div class="stack-desc" style="color:var(--ink2)">Unified data, hybrid search, semantic reranking, RBAC, inference API</div>
+        </div>
+      </div>
+    </div>
+    <div class="col" style="flex:1;gap:20px">
+      <div class="card">
+        <div class="card-h" style="color:var(--blue-lt)">What Elasticsearch Provides</div>
+        <div class="card-b">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div><strong>One datastore</strong> for messy enterprise data — tickets, logs, docs, all formats</div>
+            <div><strong>Best-in-class hybrid search</strong> — vector (kNN) + lexical (BM25) + semantic reranking</div>
+            <div><strong>Built-in GPU inference</strong> — Jina AI embeddings and rerankers natively</div>
+            <div><strong>Battle-tested RBAC</strong> — field-level security, data sovereignty built in</div>
+          </div>
+        </div>
+      </div>
+      <div class="alert a-cyan">
+        <span class="a-icon">⚡</span>
+        <div>No external vector DB. No separate observability stack. No glue code. The entire harness data plane is one engine.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ S6: RATCHET PRINCIPLE ════════════════════════════════════════════ -->
+<div class="slide" id="s6">
+  <div class="hdr">
+    <div class="label">Harness Engineering Practice</div>
+    <div class="hdg2">The Ratchet Principle</div>
+    <p class="sub">Every agent mistake is a permanent signal. Harness engineering tightens one notch each time the agent slips.</p>
+  </div>
+  <div class="body" style="flex-direction:column;gap:0;padding-top:32px">
+    <div class="ratchet-list">
+      <div class="ratchet-row">
+        <div class="r-cause">
+          <div class="r-cause-label">Mistake 1</div>
+          <div class="r-cause-text">Agent ships PR with commented-out test</div>
+        </div>
+        <div class="r-arrow">→</div>
+        <div class="r-rule">
+          <div class="r-rule-label">AGENTS.md rule</div>
+          <div class="r-rule-text">"Never comment out tests. Delete them or fix them."</div>
+        </div>
+      </div>
+      <div class="ratchet-row">
+        <div class="r-cause">
+          <div class="r-cause-label">Mistake 2</div>
+          <div class="r-cause-text">Agent runs destructive command (rm -rf)</div>
+        </div>
+        <div class="r-arrow">→</div>
+        <div class="r-rule">
+          <div class="r-rule-label">Hook added</div>
+          <div class="r-rule-text">Blocks rm -rf, git push --force, DROP TABLE before execution</div>
+        </div>
+      </div>
+      <div class="ratchet-row">
+        <div class="r-cause">
+          <div class="r-cause-label">Mistake 3</div>
+          <div class="r-cause-text">Agent gets lost in a 40-step task</div>
+        </div>
+        <div class="r-arrow">→</div>
+        <div class="r-rule">
+          <div class="r-rule-label">Orchestration</div>
+          <div class="r-rule-text">Split into planner subagent + executor subagent</div>
+        </div>
+      </div>
+      <div class="ratchet-row">
+        <div class="r-cause">
+          <div class="r-cause-label">Mistake 4</div>
+          <div class="r-cause-text">Agent keeps finishing broken code</div>
+        </div>
+        <div class="r-arrow">→</div>
+        <div class="r-rule">
+          <div class="r-rule-label">Loop hook</div>
+          <div class="r-rule-text">Typecheck + lint + tests after every edit. Failures injected into loop.</div>
+        </div>
+      </div>
+    </div>
+    <div class="alert a-blue" style="margin-top:20px;flex-shrink:0">
+      <span class="a-icon">💬</span>
+      <div style="font-size:18px">"Every line in a good AGENTS.md should be traceable back to a specific thing that went wrong." — Addy Osmani</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ S7: CONTEXT ENGINEERING ══════════════════════════════════════════ -->
+<div class="slide" id="s7">
+  <div class="hdr">
+    <div class="label">Core Discipline</div>
+    <div class="hdg2">Context Engineering: The Harness's Core Job</div>
+    <p class="sub">Harnesses are largely delivery mechanisms for good context engineering. Context is scarce — every token must earn its place.</p>
+  </div>
+  <div class="body" style="flex-direction:column;gap:18px;padding-top:30px">
+    <div class="ctx-steps">
+      <div class="ctx-step">
+        <div class="ctx-num" style="background:rgba(11,100,221,.2);color:var(--blue-lt)">1</div>
+        <div class="ctx-title" style="color:var(--blue-lt)">Connect</div>
+        <div class="ctx-body">Unify all enterprise data — tickets, logs, documents, feedback — in one datastore. Index, clean, label via ingest pipelines. RBAC controls who sees what.</div>
+      </div>
+      <div class="ctx-step">
+        <div class="ctx-num" style="background:rgba(72,239,207,.15);color:var(--cyan)">2</div>
+        <div class="ctx-title" style="color:var(--cyan)">Retrieve</div>
+        <div class="ctx-body">Hybrid search combines vector (kNN) + lexical (BM25). Semantic reranking re-scores top results. Just-in-time context — retrieve only what the agent needs right now.</div>
+      </div>
+      <div class="ctx-step">
+        <div class="ctx-num" style="background:rgba(11,100,221,.2);color:var(--blue-lt)">3</div>
+        <div class="ctx-title" style="color:var(--blue-lt)">Structure</div>
+        <div class="ctx-body">ES|QL tools give agents precise, parameterised queries. Custom tools encode business logic. MCP servers expose external capabilities. Clear tool descriptions = clear agent behaviour.</div>
+      </div>
+      <div class="ctx-step">
+        <div class="ctx-num" style="background:rgba(254,197,20,.15);color:var(--amber)">4</div>
+        <div class="ctx-title" style="color:var(--amber)">Adapt</div>
+        <div class="ctx-body">Memory files persist across sessions. Compaction offloads stale context. Progressive disclosure loads skills only when needed. Evaluation metrics drive continuous improvement.</div>
+      </div>
+    </div>
+    <div class="alert a-amber" style="flex-shrink:0">
+      <span class="a-icon">⚠</span>
+      <div><strong>Context rot:</strong> models get worse as the context window fills. Counter-techniques: <strong>Compaction</strong> (summarise &amp; offload) · <strong>Tool-call offloading</strong> (keep head/tail, filesystem the rest) · <strong>Skills with progressive disclosure</strong> (load only when needed)</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ S8: AGENT BUILDER ════════════════════════════════════════════════ -->
+<div class="slide" id="s8">
+  <div class="hdr">
+    <div class="label">Product</div>
+    <div class="hdg2">Agent Builder: Elastic's Harness Implementation</div>
+    <p class="sub">Ship agents grounded in your data in minutes. Built-in conversational agent, custom tools, custom agents, MCP/A2A integration. GA January 2026.</p>
+  </div>
+  <div class="body">
+    <div class="ab-grid" style="flex:1">
+      <div class="ab-card">
+        <div class="ab-title">💬 Chat with Your Data</div>
+        <div class="ab-body">Built-in Elastic AI Agent. Ask questions in natural language. Searches right indices, structures queries, returns relevant context. Full Kibana UI + API.</div>
+      </div>
+      <div class="ab-card">
+        <div class="ab-title">🔧 Custom Tools</div>
+        <div class="ab-body">Index Search — scope search to specific indices. ES|QL tools — custom business logic with parameterised queries. Register via API. Agent discovers and calls them.</div>
+      </div>
+      <div class="ab-card">
+        <div class="ab-title">🤖 Custom Agents</div>
+        <div class="ab-body">Define custom system prompt. Assign specific tools. Configure security profile. Expose via chat, API, MCP, or A2A. Full tracing and observability.</div>
+      </div>
+      <div class="ab-card" style="display:flex;flex-direction:column;gap:14px">
+        <div class="ab-title">🔌 Integration Points</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;flex:1">
+          <div style="background:var(--surf2);border-radius:8px;padding:12px 14px">
+            <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:6px">REST API</div>
+            <div style="font-family:var(--mono);font-size:11px;color:var(--ink3);line-height:1.6">/api/agent_builder/tools<br>/api/agent_builder/agents<br>/api/agent_builder/converse</div>
+          </div>
+          <div style="background:var(--surf2);border-radius:8px;padding:12px 14px">
+            <div style="font-size:13px;font-weight:700;color:var(--cyan);margin-bottom:6px">MCP Protocol</div>
+            <div style="font-size:12px;color:var(--ink3);line-height:1.6">Expose tools to Claude Desktop, Cursor, VS Code, any MCP client.</div>
+          </div>
+          <div style="background:var(--surf2);border-radius:8px;padding:12px 14px">
+            <div style="font-size:13px;font-weight:700;color:var(--amber);margin-bottom:6px">A2A Protocol</div>
+            <div style="font-size:12px;color:var(--ink3);line-height:1.6">Agent-to-Agent communication with external agentic frameworks.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col" style="flex:0 0 360px;gap:18px">
+      <div class="alert a-blue" style="flex-shrink:0">
+        <span class="a-icon">🌐</span>
+        <div style="font-size:16px"><strong>LLM-agnostic:</strong> OpenAI, Bedrock, Gemini, or local models. Full data sovereignty.</div>
+      </div>
+      <pre style="flex:1;font-size:13px"><span class="cm"># Create a custom ES|QL tool</span>
+<span class="kw">POST</span> /api/agent_builder/tools
+{
+  <span class="cy">"name"</span>: <span class="st">"vpc_flow_analysis"</span>,
+  <span class="cy">"description"</span>: <span class="st">"Analyse VPC flow logs"</span>,
+  <span class="cy">"type"</span>: <span class="st">"esql"</span>,
+  <span class="cy">"query"</span>: <span class="st">"FROM logs-aws.vpcflow-default | WHERE action == 'REJECT' | STATS count BY src_addr | SORT count DESC"</span>
+}
+
+<span class="cm"># Create an agent using the tool</span>
+<span class="kw">POST</span> /api/agent_builder/agents
+{
+  <span class="cy">"name"</span>: <span class="st">"Network Ops Agent"</span>,
+  <span class="cy">"tools"</span>: [<span class="st">"vpc_flow_analysis"</span>],
+  <span class="cy">"system_prompt"</span>: <span class="st">"You are a network security analyst..."</span>
+}</pre>
+    </div>
+  </div>
+</div>
+
+<!-- ══ S9: THE LOOP ══════════════════════════════════════════════════════ -->
+<div class="slide" id="s9">
+  <div class="hdr">
+    <div class="label">Execution Pattern</div>
+    <div class="hdg2">The Agent Loop: ReAct + Hooks</div>
+    <p class="sub">The core execution pattern: Reason → Act → Observe → Repeat. Hooks intercept at every lifecycle point to enforce constraints.</p>
+  </div>
+  <div class="body">
+    <div class="loop-wrap">
+      <div class="loop-diagram">
+        <div class="loop-node" style="background:rgba(255,255,255,.06);border:1px solid var(--border)">
+          <h3 style="color:var(--ink)">REASON</h3>
+          <p>LLM analyses context, plans next action</p>
+        </div>
+        <div class="loop-arrow">▼</div>
+        <div class="loop-node" style="background:rgba(11,100,221,.12);border:1px solid rgba(11,100,221,.35)">
+          <h3 style="color:var(--blue-lt)">ACT</h3>
+          <p>Agent calls a tool — search, ES|QL, bash, API</p>
+        </div>
+        <div class="loop-arrow">▼</div>
+        <div class="loop-node" style="background:rgba(72,239,207,.08);border:1px solid rgba(72,239,207,.3)">
+          <h3 style="color:var(--cyan)">OBSERVE</h3>
+          <p>Tool output fed back into context. Loop repeats.</p>
+        </div>
+        <div class="loop-cycle">⟲</div>
+        <div style="font-size:15px;color:var(--ink4);text-align:center">Continues until goal reached or stopped</div>
+      </div>
+      <div class="hooks-col">
+        <div style="font-size:18px;font-weight:700;color:var(--pink);margin-bottom:4px">⛨ Hooks — the safety system</div>
+        <div class="hook-item">
+          <div class="hook-when">Before tool call</div>
+          <div class="hook-what">Block destructive commands — <strong>rm -rf, DROP TABLE, git push --force</strong> never execute</div>
+        </div>
+        <div class="hook-item">
+          <div class="hook-when">After file edit</div>
+          <div class="hook-what">Run <strong>typecheck + lint + tests</strong> automatically. Failures injected back into the reasoning loop.</div>
+        </div>
+        <div class="hook-item">
+          <div class="hook-when">Before commit</div>
+          <div class="hook-what">Require <strong>human approval</strong> for high-risk changes — git push, deploy, schema migration</div>
+        </div>
+        <div class="hook-item">
+          <div class="hook-when">On session start</div>
+          <div class="hook-what">Inject <strong>AGENTS.md &amp; memory files</strong> — agent inherits all accumulated rules</div>
+        </div>
+        <div class="hook-item">
+          <div class="hook-when">On context limit</div>
+          <div class="hook-what"><strong>Compaction</strong> — summarise &amp; offload stale context. Preserve head/tail, skeleton of progress.</div>
+        </div>
+        <div class="hook-item">
+          <div class="hook-when">On ES|QL query</div>
+          <div class="hook-what">RBAC enforced — agent can only query <strong>indices within its permission scope</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ S10: HARNESS CONVERGENCE ══════════════════════════════════════════ -->
+<div class="slide" id="s10">
+  <div class="hdr">
+    <div class="label">Industry Trend</div>
+    <div class="hdg2">Harness Convergence</div>
+    <p class="sub">The models are different. The harness patterns are converging. The industry is finding the load-bearing scaffolding that turns a generative model into something that can ship.</p>
+  </div>
+  <div class="body" style="flex-direction:column;gap:16px">
+    <div class="conv-top">
+      <div class="model-box"><div class="name">Claude 4 Opus</div><div class="by">Anthropic</div></div>
+      <div class="model-box"><div class="name">GPT-5</div><div class="by">OpenAI</div></div>
+      <div class="model-box"><div class="name">Gemini 3</div><div class="by">Google</div></div>
+      <div class="model-box"><div class="name">Llama 4</div><div class="by">Meta</div></div>
+      <div class="model-box"><div class="name">Your Model</div><div class="by">Any Provider</div></div>
+    </div>
+    <div class="conv-arrow-row">
+      <div class="conv-down">▼</div><div class="conv-down">▼</div><div class="conv-down">▼</div><div class="conv-down">▼</div><div class="conv-down">▼</div>
+    </div>
+    <div class="conv-harness">
+      <h3>THE HARNESS — The Converging Control Plane</h3>
+      <p>Every agent product shares the same harness primitives: <strong style="color:var(--ink)">system prompts · tools · context injection · hooks · subagents · sandboxes · memory · observability</strong></p>
+    </div>
+    <div class="conv-bottom">
+      <div class="conv-half diverge">
+        <div style="font-size:17px;font-weight:700;color:var(--pink);margin-bottom:10px">Where Models Diverge</div>
+        <ul class="bullet-list" style="gap:7px">
+          <li style="color:#FFB0D0">Weights, training data, architecture</li>
+          <li style="color:#FFB0D0">Context window size</li>
+          <li style="color:#FFB0D0">Multimodal capabilities</li>
+          <li style="color:#FFB0D0">Coding vs. reasoning strengths</li>
+          <li style="color:#FFB0D0">Post-training alignment</li>
+          <li style="color:#FFB0D0">Inference speed &amp; cost</li>
+        </ul>
+      </div>
+      <div class="conv-half converge">
+        <div style="font-size:17px;font-weight:700;color:var(--cyan);margin-bottom:10px">Where Harnesses Converge</div>
+        <ul class="bullet-list" style="gap:7px">
+          <li>ReAct loop pattern</li>
+          <li>Tool-calling interface (MCP)</li>
+          <li>Filesystem + sandbox execution</li>
+          <li>AGENTS.md / system prompt pattern</li>
+          <li>Hooks for guardrails</li>
+          <li>Compaction for context management</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ S11: MATURITY MODEL ════════════════════════════════════════════════ -->
+<div class="slide" id="s11">
+  <div class="hdr">
+    <div class="label">Framework</div>
+    <div class="hdg2">Harness Maturity Model</div>
+    <p class="sub">From raw model to production-grade agent — the harness maturity journey.</p>
+  </div>
+  <div class="body" style="flex-direction:column;padding-top:28px">
+    <div class="maturity-row">
+      <div class="mat-card" style="background:rgba(240,78,152,.06);border-color:rgba(240,78,152,.3)">
+        <div class="mat-lvl" style="color:var(--pink)">Level 1</div>
+        <div class="mat-title" style="color:var(--pink)">Raw Model</div>
+        <ul class="bullet-list" style="gap:8px">
+          <li>Chat interface only</li>
+          <li>No tool execution</li>
+          <li>No persistent state</li>
+          <li>Copy-paste workflow</li>
+          <li>No audit trail</li>
+          <li style="color:var(--pink)">Every mistake is a surprise</li>
+        </ul>
+      </div>
+      <div class="mat-card" style="background:rgba(254,197,20,.05);border-color:rgba(254,197,20,.3)">
+        <div class="mat-lvl" style="color:var(--amber)">Level 2</div>
+        <div class="mat-title" style="color:var(--amber)">Basic Harness</div>
+        <ul class="bullet-list" style="gap:8px">
+          <li>System prompt + AGENTS.md</li>
+          <li>Filesystem access</li>
+          <li>Basic tool calling</li>
+          <li>Single agent, one session</li>
+          <li>Manual error recovery</li>
+          <li style="color:var(--amber)">Ad hoc fixes after failures</li>
+        </ul>
+      </div>
+      <div class="mat-card" style="background:rgba(11,100,221,.07);border-color:rgba(11,100,221,.35)">
+        <div class="mat-lvl" style="color:var(--blue-lt)">Level 3</div>
+        <div class="mat-title" style="color:var(--blue-lt)">Engineered Harness</div>
+        <ul class="bullet-list" style="gap:8px">
+          <li>Hooks enforce rules automatically</li>
+          <li>Subagents: planning + execution</li>
+          <li>Compaction for long sessions</li>
+          <li>Memory persists across sessions</li>
+          <li>Typecheck/lint/test in loop</li>
+          <li style="color:var(--blue-lt)">Every mistake → permanent rule</li>
+        </ul>
+      </div>
+      <div class="mat-card" style="background:rgba(72,239,207,.05);border-color:rgba(72,239,207,.3)">
+        <div class="mat-lvl" style="color:var(--cyan)">Level 4</div>
+        <div class="mat-title" style="color:var(--cyan)">Production Platform</div>
+        <ul class="bullet-list" style="gap:8px">
+          <li>Multi-agent orchestration</li>
+          <li>Full observability + cost tracking</li>
+          <li>RBAC + data sovereignty</li>
+          <li>MCP + A2A integration</li>
+          <li>Continuous evaluation</li>
+          <li style="color:var(--cyan)">Harness-as-a-Service (HaaS)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="alert a-blue" style="margin-top:18px;flex-shrink:0">
+      <span class="a-icon">🎯</span>
+      <div>Elastic Agent Builder is a <strong>Level 4 platform out of the box</strong> — data foundation, RBAC, observability, MCP/A2A, and orchestration included.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ S12: SOURCE VISUAL 1 ════════════════════════════════════════════ -->
+<div class="slide" id="s12">
+  <div class="hdr" style="border-bottom:none;padding-bottom:16px">
+    <div class="label">Concept Visual</div>
+    <div class="hdg3">Elastic Is the Flight Computer for LLM Agents</div>
+  </div>
+  <div class="img-slide">
+    <img src="ELASTIC IS THE FLIGHT COMPUTER THAT LETS YOU DRIVE LLM AGENTS WITH CONFIDENCE.png"
+         alt="Elastic is the Flight Computer that lets you drive LLM agents with confidence"
+         onerror="this.parentElement.innerHTML='<div style=\'display:flex;align-items:center;justify-content:center;flex:1;flex-direction:column;gap:18px;color:var(--ink3)\'><div style=\'font-size:48px\'>🖼</div><div style=\'font-size:22px\'>Image: ELASTIC IS THE FLIGHT COMPUTER THAT LETS YOU DRIVE LLM AGENTS WITH CONFIDENCE.png</div><div style=\'font-size:16px;color:var(--ink4)\'>Place the PNG file in the same folder as this HTML file</div></div>'"/>
+    <div class="img-caption">Original concept diagram — Elastic as the flight computer for LLM agent harnesses</div>
+  </div>
+</div>
+
+<!-- ══ S13: SOURCE VISUAL 2 ════════════════════════════════════════════ -->
+<div class="slide" id="s13">
+  <div class="hdr" style="border-bottom:none;padding-bottom:16px">
+    <div class="label">Concept Visual</div>
+    <div class="hdg3">Elasticsearch as the Central LLM Agent Harness Engine</div>
+  </div>
+  <div class="img-slide">
+    <img src="ELASTICSEARCH DRIVES THE LLM AGENT HARNESS.png"
+         alt="Elasticsearch Drives the LLM Agent Harness"
+         onerror="this.parentElement.innerHTML='<div style=\'display:flex;align-items:center;justify-content:center;flex:1;flex-direction:column;gap:18px;color:var(--ink3)\'><div style=\'font-size:48px\'>🖼</div><div style=\'font-size:22px\'>Image: ELASTICSEARCH DRIVES THE LLM AGENT HARNESS.png</div><div style=\'font-size:16px;color:var(--ink4)\'>Place the PNG file in the same folder as this HTML file</div></div>'"/>
+    <div class="img-caption">Original concept diagram — Elasticsearch driving the LLM agent harness</div>
+  </div>
+</div>
+
+<!-- ══ S14: SECURITY & O11Y ════════════════════════════════════════════ -->
+<div class="slide" id="s14">
+  <div class="hdr">
+    <div class="label">Use Cases</div>
+    <div class="hdg2">Harness Engineering in Security &amp; O11y</div>
+    <p class="sub">The same harness primitives — tools, context, hooks, orchestration — power both Security operations and Observability workflows.</p>
+  </div>
+  <div class="body">
+    <div class="domains">
+      <div class="domain" style="border-color:rgba(240,78,152,.3)">
+        <div class="domain-title" style="color:var(--pink)">🔒 Security Operations (SIEM / SOC)</div>
+        <div class="agent-row">
+          <div class="agent-item">
+            <div class="agent-name">Alert Triage Agent</div>
+            <div class="agent-harness">ES|QL alert tools + RBAC (analyst scope only) + human-gate on HIGH severity + full reasoning trace per decision</div>
+          </div>
+          <div class="agent-item">
+            <div class="agent-name">Threat Hunt Agent</div>
+            <div class="agent-harness">Hybrid search across SIEM + EDR + threat intel + hook blocks destructive queries + subagent per IOC cluster</div>
+          </div>
+          <div class="agent-item">
+            <div class="agent-name">APT Discovery Agent</div>
+            <div class="agent-harness">ML anomaly jobs as tools + kill chain context injection + escalation subagent on severity ≥ critical</div>
+          </div>
+        </div>
+      </div>
+      <div class="domain" style="border-color:rgba(11,100,221,.35)">
+        <div class="domain-title" style="color:var(--blue-lt)">📊 Observability (APM / Infra / Logs)</div>
+        <div class="agent-row">
+          <div class="agent-item">
+            <div class="agent-name">Incident RCA Agent</div>
+            <div class="agent-harness">APM trace tools + log group tools + compaction after 10k log window + hook that pins service topology in context</div>
+          </div>
+          <div class="agent-item">
+            <div class="agent-name">Anomaly Detection Agent</div>
+            <div class="agent-harness">ML job results as tools + metrics ES|QL + host/service context injection + alert creation tool gated on analyst confirmation</div>
+          </div>
+          <div class="agent-item">
+            <div class="agent-name">SLO Breach Agent</div>
+            <div class="agent-harness">SLO burn rate tools + downstream service subagents + auto-create PagerDuty ticket via MCP if SLO &lt; 50% budget</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="alert a-cyan" style="position:absolute;bottom:36px;left:80px;right:80px">
+      <span class="a-icon">⚡</span>
+      <div><strong>Shared harness:</strong> same Elasticsearch data, same RBAC, same trace infrastructure — Security and O11y agents share the flight computer. One engine. Two domains.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ S15: WHY ELASTIC ════════════════════════════════════════════════ -->
+<div class="slide" id="s15">
+  <div class="hdr" style="padding:32px 80px 20px">
+    <div class="label">Competitive Positioning</div>
+    <div class="hdg2">Why Elastic Over Other Frameworks?</div>
+    <p class="sub" style="margin:4px 0 0">Frameworks build the loop. Elastic is the data plane, retrieval engine, and control plane — all in one.</p>
+  </div>
+  <div class="body" style="flex-direction:column;gap:16px;padding:28px 80px 28px">
+    <div class="comp-table">
+      <!-- Headers -->
+      <div class="ct-head">Capability</div>
+      <div class="ct-head">LangChain / CrewAI</div>
+      <div class="ct-head">AutoGen / AG2</div>
+      <div class="ct-head">LlamaIndex</div>
+      <div class="ct-head hl" style="background:rgba(11,100,221,.15);border-radius:0 12px 0 0">Elastic Agent Builder</div>
+      <!-- Row 1 -->
+      <div class="ct-row-label">Data storage &amp; retrieval</div>
+      <div class="ct-cell bad">External DB required</div>
+      <div class="ct-cell bad">External DB required</div>
+      <div class="ct-cell ok">Pluggable only</div>
+      <div class="ct-cell best hl">Built-in unified store</div>
+      <!-- Row 2 -->
+      <div class="ct-row-label">Hybrid search + reranking</div>
+      <div class="ct-cell bad">Plugin/external only</div>
+      <div class="ct-cell bad">Not native</div>
+      <div class="ct-cell good">Core feature</div>
+      <div class="ct-cell best hl">Native + GPU inference</div>
+      <!-- Row 3 -->
+      <div class="ct-row-label">RBAC + field-level security</div>
+      <div class="ct-cell bad">Manual/external</div>
+      <div class="ct-cell bad">Manual/external</div>
+      <div class="ct-cell bad">Manual/external</div>
+      <div class="ct-cell best hl">Native, battle-tested</div>
+      <!-- Row 4 -->
+      <div class="ct-row-label">Agent observability / tracing</div>
+      <div class="ct-cell ok">LangSmith (paid add-on)</div>
+      <div class="ct-cell bad">Basic logs only</div>
+      <div class="ct-cell ok">Llamatrace (basic)</div>
+      <div class="ct-cell best hl">Full APM + cost tracking</div>
+      <!-- Row 5 -->
+      <div class="ct-row-label">MCP + A2A integration</div>
+      <div class="ct-cell ok">MCP via plugin</div>
+      <div class="ct-cell ok">Partial MCP support</div>
+      <div class="ct-cell ok">MCP via plugin</div>
+      <div class="ct-cell best hl">Native MCP + A2A</div>
+      <!-- Row 6 -->
+      <div class="ct-row-label">LLM model agnostic</div>
+      <div class="ct-cell good">Yes</div>
+      <div class="ct-cell good">Yes</div>
+      <div class="ct-cell good">Yes</div>
+      <div class="ct-cell best hl">Yes (GA Jan 2026)</div>
+    </div>
+    <div class="alert a-blue" style="flex-shrink:0">
+      <span class="a-icon">⚡</span>
+      <div>Elastic is the <strong>only platform</strong> where data, search, security, observability, and AI agents live natively in one engine. No glue code. No external vector DB. No separate observability stack.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ S16: CLOSING ════════════════════════════════════════════════════ -->
+<div class="slide" id="s16">
+  <div class="hero">
+    <div class="eyebrow">Get Started</div>
+    <h1>Build Your<br>Harness</h1>
+    <div class="sub2">Elasticsearch drives the agent harness. Start building today.</div>
+    <div style="width:160px;height:4px;background:linear-gradient(90deg,var(--blue),var(--cyan));border-radius:2px"></div>
+    <div style="font-size:18px;font-weight:700;color:var(--ink3);margin-top:8px">Learn more:</div>
+    <div class="links">
+      <div class="link-item">→ <span>elastic.co/elasticsearch/agent-builder</span></div>
+      <div class="link-item">→ <span>elastic.co/elasticsearch/context-engineering</span></div>
+      <div class="link-item">→ <span>elastic.co/search-labs/blog/elastic-ai-agent-builder-context-engineering-introduction</span></div>
+      <div class="link-item">→ <span>addyosmani.com/blog/agent-harness-engineering</span></div>
+    </div>
+    <div class="tags" style="margin-top:12px">
+      <span class="badge b-blue">Agent Builder GA</span>
+      <span class="badge b-cyan">Context Engineering</span>
+      <span class="badge b-amber">MCP + A2A</span>
+    </div>
+  </div>
+  <div class="bar"></div>
+</div>
+
+</div><!-- #deck -->
+</div><!-- #wrap -->
+
+<!-- ── NAV ── -->
+<div id="nav">
+  <button id="prev" onclick="go(-1)">‹</button>
+  <div class="pips" id="pips"></div>
+  <button id="next" onclick="go(1)">›</button>
+  <span id="ctr">1 / 16</span>
+</div>
+
+<script>
+const SLIDES = document.querySelectorAll('.slide');
+const N = SLIDES.length;
+const KEY = 'harness-slide';
+let cur = Math.min(+(localStorage.getItem(KEY)||0), N-1);
+
+const ctr   = document.getElementById('ctr');
+const pips  = document.getElementById('pips');
+const prevB = document.getElementById('prev');
+const nextB = document.getElementById('next');
+
+for(let i=0;i<N;i++){
+  const p=document.createElement('div');
+  p.className='pip';
+  p.title=`Slide ${i+1}`;
+  p.onclick=()=>show(i);
+  pips.appendChild(p);
+}
+
+function show(i){
+  SLIDES[cur].classList.remove('active');
+  pips.children[cur].classList.remove('active');
+  cur=(i+N)%N;
+  SLIDES[cur].classList.add('active');
+  pips.children[cur].classList.add('active');
+  ctr.textContent=`${cur+1} / ${N}`;
+  prevB.disabled=cur===0;
+  nextB.disabled=cur===N-1;
+  localStorage.setItem(KEY,cur);
+}
+function go(d){show(cur+d);}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' '){e.preventDefault();go(1);}
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp'){e.preventDefault();go(-1);}
+  if(e.key==='Home'){show(0);}
+  if(e.key==='End'){show(N-1);}
+  // number keys 1-9
+  const n=parseInt(e.key);
+  if(n>=1&&n<=N)show(n-1);
+});
+
+function scale(){
+  const d=document.getElementById('deck');
+  const s=Math.min(window.innerWidth/1920,window.innerHeight/1080);
+  d.style.transform=`scale(${s})`;
+}
+window.addEventListener('resize',scale);
+scale();
+show(cur);
+</script>
+</body>
+</html>

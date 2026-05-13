@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3 Critical Considerations Before Choosing Splunk</title>
+  <style>
+    :root {
+      --elastic-blue: #0077CC;
+      --elastic-cyan: #48EFCF;
+      --elastic-pink: #FF6B9D;
+      --elastic-green: #4ADE80;
+      --elastic-yellow: #FEC514;
+      --elastic-red: #FF6B6B;
+      --bg-dark: #0C1116;
+      --bg-card: #18222D;
+      --bg-card-alt: #111820;
+      --text-primary: #FFFFFF;
+      --text-muted: #9CA3AF;
+      --text-dim: #6B7280;
+      --border-subtle: rgba(255,255,255,0.08);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      overflow: hidden;
+    }
+
+    #deck {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+
+    .slide {
+      width: 1920px;
+      height: 1080px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.5);
+      transform-origin: center;
+      background: var(--bg-dark);
+      padding: 60px 80px;
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .slide.active { display: flex; }
+
+    .slide-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+    }
+
+    .slide-title {
+      font-size: 44px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.2;
+    }
+
+    .slide-subtitle {
+      font-size: 22px;
+      color: var(--text-muted);
+      margin-top: 8px;
+      font-weight: 400;
+    }
+
+    .slide-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .slide-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 16px;
+      color: var(--text-dim);
+      margin-top: 32px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .elastic-logo-text {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--elastic-cyan);
+      letter-spacing: -0.5px;
+    }
+
+    /* Title slide */
+    .title-slide {
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .title-main {
+      font-size: 72px;
+      font-weight: 800;
+      line-height: 1.15;
+      color: var(--text-primary);
+    }
+
+    .title-highlight {
+      color: var(--elastic-cyan);
+    }
+
+    .title-subtitle {
+      font-size: 28px;
+      color: var(--text-muted);
+      margin-top: 24px;
+      font-weight: 400;
+      max-width: 900px;
+    }
+
+    .title-meta {
+      font-size: 18px;
+      color: var(--text-dim);
+      margin-top: 48px;
+    }
+
+    /* Key takeaway box */
+    .key-takeaway {
+      background: linear-gradient(135deg, rgba(0, 119, 204, 0.12), rgba(72, 239, 207, 0.08));
+      border-left: 5px solid var(--elastic-cyan);
+      padding: 24px 32px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+
+    .key-takeaway-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--elastic-cyan);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 10px;
+    }
+
+    .key-takeaway-text {
+      font-size: 24px;
+      font-weight: 600;
+      line-height: 1.5;
+      color: var(--text-primary);
+    }
+
+    /* Comparison cards */
+    .comparison-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      flex: 1;
+    }
+
+    .comparison-card {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 32px;
+      border: 2px solid transparent;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .comparison-card.splunk-card {
+      border-color: rgba(255, 107, 107, 0.25);
+      background: linear-gradient(180deg, var(--bg-card) 0%, rgba(255, 107, 107, 0.04) 100%);
+    }
+
+    .comparison-card.elastic-card {
+      border-color: rgba(72, 239, 207, 0.25);
+      background: linear-gradient(180deg, var(--bg-card) 0%, rgba(72, 239, 207, 0.04) 100%);
+    }
+
+    .card-label {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 12px;
+      padding: 6px 14px;
+      border-radius: 4px;
+      display: inline-block;
+      align-self: flex-start;
+    }
+
+    .card-label.splunk-label {
+      color: var(--elastic-red);
+      background: rgba(255, 107, 107, 0.12);
+    }
+
+    .card-label.elastic-label {
+      color: var(--elastic-cyan);
+      background: rgba(72, 239, 207, 0.12);
+    }
+
+    .card-title {
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      line-height: 1.3;
+    }
+
+    .card-title.splunk-title { color: var(--elastic-red); }
+    .card-title.elastic-title { color: var(--elastic-cyan); }
+
+    .bullet-list {
+      list-style: none;
+      font-size: 19px;
+      line-height: 1.7;
+    }
+
+    .bullet-list li {
+      margin-bottom: 14px;
+      padding-left: 28px;
+      position: relative;
+      color: var(--text-muted);
+    }
+
+    .bullet-list li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--text-dim);
+      font-size: 22px;
+    }
+
+    .splunk-card .bullet-list li::before { color: var(--elastic-red); }
+    .elastic-card .bullet-list li::before { color: var(--elastic-cyan); }
+
+    .bullet-list li strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    /* Impact callout */
+    .impact-box {
+      background: rgba(255, 107, 107, 0.08);
+      border: 1px solid rgba(255, 107, 107, 0.2);
+      border-radius: 8px;
+      padding: 16px 24px;
+      margin-top: auto;
+    }
+
+    .impact-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--elastic-red);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .impact-text {
+      font-size: 17px;
+      color: var(--text-primary);
+      line-height: 1.5;
+    }
+
+    .elastic-card .impact-box {
+      background: rgba(72, 239, 207, 0.08);
+      border-color: rgba(72, 239, 207, 0.2);
+    }
+
+    .elastic-card .impact-label { color: var(--elastic-cyan); }
+
+    /* Nav hints */
+    .nav-hint {
+      font-size: 14px;
+      color: var(--text-dim);
+    }
+
+    .highlight-risk { color: var(--elastic-red); font-weight: 600; }
+    .highlight-advantage { color: var(--elastic-cyan); font-weight: 600; }
+    .highlight-metric { color: var(--elastic-yellow); font-weight: 700; }
+
+    /* Number badge for slides */
+    .slide-number {
+      position: absolute;
+      top: 24px;
+      right: 40px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-dim);
+      background: var(--bg-card);
+      padding: 6px 14px;
+      border-radius: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="deck">
+
+    <!-- Slide 1: Title -->
+    <div class="slide title-slide active" id="s1">
+      <div>
+        <div class="title-main">3 Critical Considerations<br>Before Choosing <span class="title-highlight">Splunk</span></div>
+        <div class="title-subtitle">What C-level and SOC leaders should verify before purchase — and how Elastic addresses each risk</div>
+        <div class="title-meta">Platform Selection Guide | May 2026</div>
+      </div>
+      <div class="slide-footer" style="border-top: none; justify-content: center;">
+        <span class="nav-hint">Navigate: Arrow keys or click to advance</span>
+      </div>
+    </div>
+
+    <!-- Slide 2: Schema-on-Read -->
+    <div class="slide" id="s2">
+      <div class="slide-number">1 / 3</div>
+      <div class="slide-header">
+        <div>
+          <div class="slide-title">Schema-on-Read: The Silent Detection Gap</div>
+          <div class="slide-subtitle">Data is indexed raw and parsed at query time — problems surface late, if at all</div>
+        </div>
+        <div class="elastic-logo-text">Elastic</div>
+      </div>
+      <div class="slide-content">
+        <div class="key-takeaway">
+          <div class="key-takeaway-label">Core Risk</div>
+          <div class="key-takeaway-text">Splunk discovers data quality issues <span class="highlight-risk">at query time</span>, not ingestion time — meaning threats can be silently missed for days or weeks</div>
+        </div>
+        <div class="comparison-container">
+          <div class="comparison-card splunk-card">
+            <div class="card-label splunk-label">Splunk Approach</div>
+            <div class="card-title splunk-title">Schema-on-Read</div>
+            <ul class="bullet-list">
+              <li><strong>Delayed detection:</strong> Format changes, parsing errors, and field mismatches are only discovered when someone runs a query</li>
+              <li><strong>Inconsistent results:</strong> Same search can return different results depending on user settings, search-time config, and knowledge objects</li>
+              <li><strong>Exponential resource growth:</strong> Every query re-parses raw data — CPU and I/O scale non-linearly with data volume and query concurrency</li>
+              <li><strong>False negatives:</strong> A detection rule may silently fail because a field was not extracted correctly at search time, with no alert</li>
+            </ul>
+            <div class="impact-box">
+              <div class="impact-label">Business Impact</div>
+              <div class="impact-text">Threats slip through. SOC teams waste hours debugging why queries return inconsistent results. Infrastructure costs spike unpredictably.</div>
+            </div>
+          </div>
+          <div class="comparison-card elastic-card">
+            <div class="card-label elastic-label">Elastic Approach</div>
+            <div class="card-title elastic-title">Schema-on-Write (ECS)</div>
+            <ul class="bullet-list">
+              <li><strong>Early validation:</strong> Data is parsed and normalized at ingestion using Elastic Common Schema (ECS) — format issues trigger alerts immediately</li>
+              <li><strong>Consistent results:</strong> Every analyst gets the same answer from the same data, regardless of who runs the query</li>
+              <li><strong>Linear scaling:</strong> Parse once, index once, reuse forever — search performance stays predictable as data grows</li>
+              <li><strong>No silent failures:</strong> If a field is missing or malformed, the pipeline flags it — detection rules never run on bad data unknowingly</li>
+            </ul>
+            <div class="impact-box">
+              <div class="impact-label">Elastic Advantage</div>
+              <div class="impact-text">Catch data quality issues before they become detection gaps. Consistent, fast searches. Predictable infrastructure costs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span class="nav-hint">Press Right arrow for next risk</span>
+        <span class="nav-hint">Slide 1 / 3</span>
+      </div>
+    </div>
+
+    <!-- Slide 3: Bolted-On AI -->
+    <div class="slide" id="s3">
+      <div class="slide-number">2 / 3</div>
+      <div class="slide-header">
+        <div>
+          <div class="slide-title">AI That Adds Work, Not Removes It</div>
+          <div class="slide-subtitle">Separate products, manual setup, and limited automation mean analysts still do the heavy lifting</div>
+        </div>
+        <div class="elastic-logo-text">Elastic</div>
+      </div>
+      <div class="slide-content">
+        <div class="key-takeaway">
+          <div class="key-takeaway-label">Core Risk</div>
+          <div class="key-takeaway-text">Splunk's AI is <span class="highlight-risk">bolted-on</span> across multiple separate products — requiring weeks of engineering to set up, and still leaving analysts to manually correlate and investigate</div>
+        </div>
+        <div class="comparison-container">
+          <div class="comparison-card splunk-card">
+            <div class="card-label splunk-label">Splunk Approach</div>
+            <div class="card-title splunk-title">Fragmented AI Toolkit</div>
+            <ul class="bullet-list">
+              <li><strong>SPL query helper only:</strong> AI translates questions to SPL syntax — it does not investigate or correlate findings</li>
+              <li><strong>Manual correlation:</strong> Analysts must manually connect alerts across dashboards and data sources to find attack chains</li>
+              <li><strong>No native vector search:</strong> Semantic search and AI-powered correlation require external systems and custom integration</li>
+              <li><strong>UEBA is a separate product:</strong> Requires separate deployment, separate infrastructure, and separate management — with hardened OS constraints</li>
+              <li><strong>Weeks of setup:</strong> RAG, custom connectors, prompt tuning, and pipeline configuration before any value is delivered</li>
+            </ul>
+            <div class="impact-box">
+              <div class="impact-label">Business Impact</div>
+              <div class="impact-text">Analysts spend more time configuring tools than investigating threats. MTTR stays high. AI promise never materializes.</div>
+            </div>
+          </div>
+          <div class="comparison-card elastic-card">
+            <div class="card-label elastic-label">Elastic Approach</div>
+            <div class="card-title elastic-title">Native AI, Embedded in Platform</div>
+            <ul class="bullet-list">
+              <li><strong>AI Security Assistant:</strong> RAG-powered, context-aware investigation in natural language — grounded in your actual data</li>
+              <li><strong>Attack Discovery:</strong> AI correlates every alert automatically, surfaces hidden attack chains, enables one-click triage</li>
+              <li><strong>Native vector database:</strong> Built-in semantic search and AI correlation — no external systems needed</li>
+              <li><strong>100+ ML models included:</strong> UEBA, anomaly detection, and behavioral analytics run natively — no separate deployment</li>
+              <li><strong>Out-of-the-box RAG:</strong> Minimal configuration required — value delivered in hours, not weeks</li>
+            </ul>
+            <div class="impact-box">
+              <div class="impact-label">Elastic Advantage</div>
+              <div class="impact-text">Analysts investigate faster with AI that actually helps. Attack chains surface automatically. One platform, one setup, immediate value.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span class="nav-hint">Press Right arrow for next risk</span>
+        <span class="nav-hint">Slide 2 / 3</span>
+      </div>
+    </div>
+
+    <!-- Slide 4: Hidden Costs -->
+    <div class="slide" id="s4">
+      <div class="slide-number">3 / 3</div>
+      <div class="slide-header">
+        <div>
+          <div class="slide-title">The Hidden Cost Multiplier</div>
+          <div class="slide-subtitle">Itemized licensing and operational overhead create surprise costs that multiply post-purchase</div>
+        </div>
+        <div class="elastic-logo-text">Elastic</div>
+      </div>
+      <div class="slide-content">
+        <div class="key-takeaway">
+          <div class="key-takeaway-label">Core Risk</div>
+          <div class="key-takeaway-text">Splunk's base license is only the beginning — <span class="highlight-risk">mandatory add-ons, separate products, and manual operations</span> inflate TCO far beyond the initial quote</div>
+        </div>
+        <div class="comparison-container">
+          <div class="comparison-card splunk-card">
+            <div class="card-label splunk-label">Splunk Reality</div>
+            <div class="card-title splunk-title">Itemized + Manual = Expensive</div>
+            <ul class="bullet-list">
+              <li><strong>Two licenses required:</strong> Base platform + ES add-on at <span class="highlight-metric">1.5-2x</span> the base cost — security is not included</li>
+              <li><strong>UEBA is extra:</strong> Separate product, separate infrastructure, separate management overhead</li>
+              <li><strong>Non-prod costs extra:</strong> Staging and pre-prod environments require separate commercial licenses</li>
+              <li><strong>Manual upgrades:</strong> Downtime windows, manual orchestration, and capacity planning for every version bump</li>
+              <li><strong>Manual scaling:</strong> Search head expansion, cluster rebalancing, and tier management all require hands-on work</li>
+              <li><strong>Agent management overhead:</strong> Deployment Server required; forwarder upgrades are manual or require external automation</li>
+            </ul>
+            <div class="impact-box">
+              <div class="impact-label">Business Impact</div>
+              <div class="impact-text">Budget holders face 2-3x cost surprises. Engineering teams spend cycles on platform maintenance instead of security work. TCO grows unpredictably.</div>
+            </div>
+          </div>
+          <div class="comparison-card elastic-card">
+            <div class="card-label elastic-label">Elastic Reality</div>
+            <div class="card-title elastic-title">All-in-One + Automated = Predictable</div>
+            <ul class="bullet-list">
+              <li><strong>Single license:</strong> SIEM, endpoint security, cloud security, AI Assistant, and ML — all included, no add-ons</li>
+              <li><strong>Native UEBA:</strong> 100+ ML models run in the same platform — zero additional infrastructure</li>
+              <li><strong>Non-prod included:</strong> Staging and pre-prod environments covered under the same production license (self-managed)</li>
+              <li><strong>Automated upgrades:</strong> Zero-downtime cluster updates via ECK — no manual intervention</li>
+              <li><strong>Auto-scaling:</strong> Elastic Cloud scales nodes automatically based on workload — no capacity planning</li>
+              <li><strong>Central agent management:</strong> Elastic Agent upgraded remotely from Fleet — unified policy, coordinated rollouts</li>
+            </ul>
+            <div class="impact-box">
+              <div class="impact-label">Elastic Advantage</div>
+              <div class="impact-text">One predictable bill. No surprise add-ons. Engineering teams focus on security, not platform maintenance. TCO is transparent from day one.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span class="nav-hint">Press Home to restart</span>
+        <span class="nav-hint">Slide 3 / 3</span>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const SLIDES = document.querySelectorAll('.slide');
+    let cur = 0;
+
+    function show(n) {
+      SLIDES.forEach((s, i) => s.classList.toggle('active', i === n));
+      cur = n;
+      localStorage.setItem('splunk-risk-slide', cur);
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+        if (cur < SLIDES.length - 1) show(cur + 1);
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        if (cur > 0) show(cur - 1);
+      } else if (e.key === 'Home') {
+        show(0);
+      }
+    });
+
+    document.addEventListener('click', () => {
+      if (cur < SLIDES.length - 1) show(cur + 1);
+    });
+
+    const saved = localStorage.getItem('splunk-risk-slide');
+    if (saved !== null) show(parseInt(saved, 10));
+    else show(0);
+  </script>
+</body>
+</html>
