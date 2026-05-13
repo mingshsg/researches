@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Observability &amp; Security — Unified on the Elastic Platform</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;background:#0D0F13;font-family:'Inter',system-ui,sans-serif;overflow:hidden}
+:root{--blue:#0B64DD;--cyan:#48EFCF;--amber:#FEC514;--pink:#F04E98;--orange:#FA744E;--bg:#0D0F13;--bg2:#151820;--surf:#1C2130;--surf2:#222840;--ink:#FFFFFF;--ink2:#DCE2EA;--ink3:#A8B5C8;--border:rgba(255,255,255,.08)}
+#wrap{width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;background:#0D0F13}
+#deck{position:relative;width:1920px;height:1080px;transform-origin:top left;overflow:hidden}
+.slide{position:absolute;inset:0;display:none;background:var(--bg);flex-direction:column;overflow:hidden}
+.slide.active{display:flex}
+.elastic-logo{position:absolute;bottom:16px;right:22px;width:26px;height:26px;color:rgba(255,255,255,.25);z-index:100;pointer-events:none}
+.elastic-logo svg{width:26px;height:26px}
+.accent-bar{height:5px;background:linear-gradient(90deg,var(--blue),var(--cyan));flex-shrink:0}
+.hdr{padding:48px 80px 30px;flex-shrink:0}
+.hdg{font-size:48px;font-weight:800;color:#fff;line-height:1.1;letter-spacing:-.5px}
+.sub{margin-top:12px;font-size:20px;color:var(--ink2);line-height:1.55}
+.sub-note{font-size:14px;color:var(--ink3);margin-bottom:10px}
+.body{flex:1;padding:30px 80px 60px;display:flex;gap:24px;overflow:hidden;min-height:0}
+.body.col{flex-direction:column}
+.title-bg{flex:1;background:linear-gradient(135deg,var(--blue) 0%,#0a2a6e 60%,#0D0F13 100%);display:flex;align-items:center;padding:80px}
+.title-content{max-width:960px}
+.eyebrow{font-size:15px;font-weight:700;color:var(--cyan);letter-spacing:3px;text-transform:uppercase;margin-bottom:14px}
+h1{font-size:68px;font-weight:900;color:#fff;line-height:1.05;letter-spacing:-2px}
+.title-bar{width:120px;height:5px;background:linear-gradient(90deg,var(--cyan),var(--amber));border-radius:3px;margin:22px 0}
+.title-sub{font-size:28px;color:var(--cyan);font-weight:600}
+.title-desc{font-size:17px;color:var(--ink2);margin-top:10px;line-height:1.6}
+.title-date{font-size:14px;color:var(--ink3);margin-top:6px}
+.sec-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:linear-gradient(135deg,#0a1628 0%,var(--bg) 100%)}
+.section-label{font-size:16px;font-weight:700;color:var(--cyan);letter-spacing:4px;text-transform:uppercase}
+.section-title{font-size:60px;font-weight:900;color:#fff;text-align:center;letter-spacing:-1px}
+.section-sub{font-size:20px;color:var(--ink2);text-align:center}
+.agenda-list{display:flex;flex-direction:column;gap:14px;max-width:900px}
+.agenda-item{display:flex;align-items:center;gap:16px;font-size:22px;color:var(--ink2)}
+.anum{min-width:34px;height:34px;background:var(--blue);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff;flex-shrink:0}
+.info-card{background:var(--surf);border-radius:10px;padding:24px 26px;border:1px solid var(--border);flex:1;min-width:0}
+.ic-title{font-size:20px;font-weight:700;color:var(--blue);margin-bottom:10px}
+.ic-body{font-size:17px;color:var(--ink2);line-height:1.65}
+.two-cols{display:flex;gap:20px;flex:1;min-width:0}
+.two-by-two{display:grid;grid-template-columns:1fr 1fr;gap:20px;flex:1}
+.three-cols{display:flex;gap:20px}
+.col-card{background:var(--surf);border-radius:10px;padding:22px 24px;flex:1;border:1px solid var(--border)}
+.col-head{font-size:20px;font-weight:700;color:var(--blue);margin-bottom:10px}
+.col-body{font-size:17px;color:var(--ink2);line-height:1.65}
+.four-cols{display:flex;gap:12px;flex:1}
+.pillar-card{background:var(--surf);border-radius:10px;padding:16px;flex:1;border:1px solid var(--border);display:flex;flex-direction:column;gap:8px}
+.pillar-name{font-size:22px;font-weight:800;color:var(--blue)}
+.pillar-tag{font-size:13px;color:var(--cyan);font-weight:600;font-style:italic}
+.pillar-o11y,.pillar-sec{font-size:16px;color:var(--ink2);line-height:1.6}
+.platform-banner{background:var(--blue);border-radius:8px;padding:14px 20px;font-size:17px;font-weight:700;color:#fff;text-align:center}
+.conv-grid{display:grid;grid-template-columns:1fr auto 1fr;grid-template-rows:auto auto;gap:12px 8px;flex:1}
+.conv-box{background:var(--surf);border-radius:10px;padding:16px;border:1px solid var(--border)}
+.conv-num{font-size:14px;font-weight:800;color:var(--blue);margin-bottom:4px}
+.conv-title{font-size:18px;font-weight:700;color:#fff;margin-bottom:6px}
+.conv-desc{font-size:16px;color:var(--ink2);line-height:1.55}
+.conv-arrow{font-size:30px;color:var(--cyan);display:flex;align-items:center;justify-content:center;font-weight:700}
+.insight-bar{background:linear-gradient(90deg,var(--blue),#0a2a6e);border-radius:8px;padding:14px 20px;font-size:15px;font-weight:600;color:#fff;text-align:center;flex-shrink:0}
+.pipeline-row{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.pipe-box{background:var(--surf);border-radius:10px;padding:16px 18px;flex:1;border:1px solid var(--border);text-align:center}
+.pipe-box.dark{background:#0a1628;border-color:var(--blue)}
+.pipe-label{font-size:16px;font-weight:800;color:#fff;margin-bottom:6px}
+.pipe-sub{font-size:13px;color:var(--ink3)}
+.pipe-arrow{font-size:30px;color:var(--cyan);flex-shrink:0;font-weight:700}
+.pipe-down{text-align:center;font-size:14px;color:var(--ink3);padding:8px 0;flex-shrink:0}
+.signal-grid{display:flex;gap:12px;flex:1}
+.sig-card{background:var(--surf);border-radius:10px;padding:16px;flex:1;border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px}
+.sig-icon{font-size:30px}
+.sig-name{font-size:16px;font-weight:700;color:var(--blue)}
+.sig-desc{font-size:15px;color:var(--ink2);line-height:1.6}
+.steps-flow{display:flex;flex-direction:column;gap:12px;flex:1}
+.step-row{display:flex;align-items:flex-start;gap:14px}
+.step-num{min-width:36px;height:36px;background:var(--blue);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;color:#fff;flex-shrink:0;margin-top:2px}
+.step-content{flex:1}
+.step-title{font-size:18px;font-weight:700;color:#fff}
+.step-desc{font-size:17px;color:var(--ink2);margin-top:4px;line-height:1.65}
+.step-arr{font-size:22px;color:var(--cyan);align-self:center;flex-shrink:0}
+.ecs-fields{display:flex;gap:16px;margin-top:12px;flex-shrink:0}
+.ecs-col{flex:1;background:var(--surf);border-radius:8px;padding:14px 16px;border:1px solid var(--border)}
+.ecs-head{font-size:14px;font-weight:700;color:var(--blue);margin-bottom:8px}
+code{font-size:15px;color:var(--cyan);font-family:'Fira Code','Courier New',monospace;line-height:1.8}
+.uc-table{flex:1;display:flex;flex-direction:column;background:var(--surf);border-radius:10px;overflow:hidden;border:1px solid var(--border)}
+.uc-hdr{display:grid;grid-template-columns:28px 1.8fr 1.4fr 1.4fr 68px 68px;padding:12px 18px;font-size:15px;font-weight:700;color:var(--cyan);background:#0a1628}
+.uc-row{display:grid;grid-template-columns:28px 1.8fr 1.4fr 1.4fr 68px 68px;padding:12px 18px;font-size:15px;color:var(--ink2);border-top:1px solid var(--border)}
+.uc-row:hover{background:rgba(11,100,221,.06)}
+.t-blue{color:var(--blue);font-weight:700;text-align:center}
+.uc-link{color:var(--ink2);text-decoration:none;transition:color .2s}
+.uc-link:hover{color:var(--cyan);text-decoration:underline}
+.timeline-block{background:#0a1628;border-radius:8px;padding:14px 16px;flex-shrink:0;border:1px solid var(--border)}
+.tl-head{font-size:15px;font-weight:700;color:var(--cyan);margin-bottom:8px}
+.tl-pre{font-size:15px;color:var(--ink2);font-family:'Fira Code','Courier New',monospace;line-height:1.8;white-space:pre-wrap}
+.result-bar{background:linear-gradient(90deg,#0a3a1a,#0a2a10);border-top:1px solid rgba(74,222,128,.3);padding:14px 64px;font-size:16px;font-weight:600;color:#4ADE80;flex-shrink:0}
+.bottom-insight{background:var(--blue);padding:12px 80px;font-size:14px;font-weight:600;color:#fff;text-align:center;flex-shrink:0}
+.takeaway-card{background:var(--surf);border-radius:10px;padding:20px 22px;border:1px solid var(--border);display:flex;flex-direction:column;gap:8px}
+.tk-num{font-size:34px;font-weight:900;line-height:1}
+.tk-title{font-size:18px;font-weight:700;color:#fff}
+.tk-body{font-size:17px;color:var(--ink2);line-height:1.65}
+#nav{position:fixed;bottom:0;left:0;right:0;height:42px;background:rgba(13,15,19,.95);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;gap:12px;z-index:1000;border-top:1px solid rgba(255,255,255,.07)}
+#nav button{background:none;border:none;color:var(--ink3);font-size:22px;cursor:pointer;padding:4px 10px;border-radius:4px;transition:color .15s}
+#nav button:hover{color:#fff}
+.pips{display:flex;gap:4px;flex-wrap:wrap;max-width:720px;justify-content:center}
+.pip{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.18);cursor:pointer;transition:background .2s;flex-shrink:0}
+.pip.on{background:var(--cyan)}
+#ctr{font-size:11px;color:var(--ink3);min-width:44px;text-align:right}
+
+.scenario-box{background:rgba(11,100,221,.08);border-left:4px solid var(--blue);padding:16px 20px;border-radius:6px;margin-bottom:16px}
+.scenario-label{font-size:13px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.scenario-text{font-size:16px;color:var(--ink2);line-height:1.6}
+.log-block{background:#0a1216;border-radius:8px;padding:14px 18px;font-family:'Fira Code','Courier New',monospace;font-size:14px;line-height:1.8;border:1px solid var(--border);margin-bottom:10px}
+.log-source{display:inline-block;min-width:90px;font-weight:700;margin-right:12px}
+.log-source.o11y{color:var(--cyan)}
+.log-source.sec{color:var(--pink)}
+.log-source.stream{color:var(--amber)}
+.log-source.ecs{color:var(--blue)}
+.log-msg{color:var(--ink3)}
+.log-highlight{color:#FEC514;font-weight:700}
+.log-alert{color:#FF6B6B;font-weight:700}
+.log-success{color:#4ADE80;font-weight:700}
+.tl-alert{color:#FF6B6B}
+.tl-warning{color:var(--amber)}
+.tl-info{color:var(--cyan)}
+.tl-success{color:#4ADE80}
+
+.detection-block{background:rgba(11,100,221,.05);border-left:3px solid var(--cyan);padding:12px 16px;border-radius:6px;margin-bottom:12px}
+.det-step{font-size:13px;font-weight:700;color:var(--cyan);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px}
+.det-query{font-size:13px;color:var(--ink3);margin-bottom:8px;line-height:1.6}
+.query-label{color:var(--amber);font-weight:700;margin-right:6px}
+.det-query code{background:rgba(0,0,0,.3);padding:2px 6px;border-radius:3px;font-family:'Fira Code','Courier New',monospace;font-size:12px;color:#FEC514}
+.det-usage{font-size:12px;color:var(--blue);font-style:italic;margin-top:6px;padding-left:8px;border-left:2px solid var(--blue)}
+
+</style>
+</head>
+<body>
+<div id="wrap">
+<div id="deck">
+<div class="slide" id="s1">
+  <div class="title-bg">
+    <div class="title-content">
+      <div class="eyebrow">Elastic Platform</div>
+      <h1>Observability &amp; Security</h1>
+      <div class="title-bar"></div>
+      <div class="title-sub">Unified on the Elastic Platform</div>
+      <div class="title-desc">How Observability and Security data converge with document and knowledge support</div>
+      <div class="title-date">May 2026</div>
+    </div>
+  </div>
+  <div class="elastic-logo"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M20.345 16.33l-3.959-.926-1.05-2.01 5.177-4.535a3.962 3.962 0 012.559 3.702 4.006 4.006 0 01-2.727 3.77m-2.976 4.68c-.616 0-1.22-.207-1.714-.587l.782-4.077 3.596.841c.115.31.172.642.172.987a2.839 2.839 0 01-2.836 2.836m-2.637-.586a5.92 5.92 0 01-4.908 2.6A5.947 5.947 0 014 15.905l5.167-4.67 5.272 2.403 1.167 2.23zM.928 11.443a4.007 4.007 0 012.726-3.77l3.95.933.927 1.98-5.05 4.565a3.97 3.97 0 01-2.553-3.708m5.703-8.45a2.841 2.841 0 011.723.58l-.789 4.092-3.598-.85a2.842 2.842 0 01-.172-.986A2.84 2.84 0 016.63 2.992m2.66.59A5.92 5.92 0 0120.1 6.93c0 .4-.038.781-.114 1.164l-5.299 4.643-5.251-2.394-1.026-2.19zM24 12.571a4.723 4.723 0 00-3.124-4.454 6.695 6.695 0 00.126-1.29A6.789 6.789 0 0014.22.047 6.769 6.769 0 008.727 2.86a3.586 3.586 0 00-2.204-.754A3.604 3.604 0 003.15 6.959 4.786 4.786 0 000 11.431 4.727 4.727 0 003.139 15.9a6.876 6.876 0 00-.124 1.289 6.773 6.773 0 006.765 6.765c2.19 0 4.22-1.052 5.49-2.824a3.568 3.568 0 002.207.769 3.603 3.603 0 003.374-4.854A4.785 4.785 0 0024 12.572"/></svg></div>
+</div>
+<div class="slide" id="s2">
+  <div class="accent-bar"></div>
+  <div class="hdr"><div class="hdg">Agenda</div></div>
+  <div class="body col">
+    <div class="agenda-list">
+      <div class="agenda-item"><span class="anum">1</span><span>The Platform Foundation — Single stack, multiple solutions</span></div>
+      <div class="agenda-item"><span class="anum">2</span><span>Unified Data Collection — Elastic Agent and Fleet</span></div>
+      <div class="agenda-item"><span class="anum">3</span><span>ECS: The Common Data Language — Normalising across domains</span></div>
+      <div class="agenda-item"><span class="anum">4</span><span>Streams: AI-Powered Log Management — Serving both O11y and Security</span></div>
+      <div class="agenda-item"><span class="anum">5</span><span>Cross-Domain Data Flow — OpenTelemetry and ECS convergence</span></div>
+      <div class="agenda-item"><span class="anum">6</span><span>Real-World Patterns — O11y-driven security &amp; security-informed ops</span></div>
+      <div class="agenda-item"><span class="anum">7</span><span>Knowledge &amp; AI — AI Assistant, documentation, and shared analytics</span></div>
+    </div>
+  </div>
+  <div class="elastic-logo"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M20.345 16.33l-3.959-.926-1.05-2.01 5.177-4.535a3.962 3.962 0 012.559 3.702 4.006 4.006 0 01-2.727 3.77m-2.976 4.68c-.616 0-1.22-.207-1.714-.587l.782-4.077 3.596.841c.115.31.172.642.172.987a2.839 2.839 0 01-2.836 2.836m-2.637-.586a5.92 5.92 0 01-4.908 2.6A5.947 5.947 0 014 15.905l5.167-4.67 5.272 2.403 1.167 2.23zM.928 11.443a4.007 4.007 0 012.726-3.77l3.95.933.927 1.98-5.05 4.565a3.97 3.97 0 01-2.553-3.708m5.703-8.45a2.841 2.841 0 011.723.58l-.789 4.092-3.598-.85a2.842 2.842 0 01-.172-.986A2.84 2.84 0 016.63 2.992m2.66.59A5.92 5.92 0 0120.1 6.93c0 .4-.038.781-.114 1.164l-5.299 4.643-5.251-2.394-1.026-2.19zM24 12.571a4.723 4.723 0 00-3.124-4.454 6.695 6.695 0 00.126-1.29A6.789 6.789 0 0014.22.047 6.769 6.769 0 008.727 2.86a3.586 3.586 0 00-2.204-.754A3.604 3.604 0 003.15 6.959 4.786 4.786 0 000 11.431 4.727 4.727 0 003.139 15.9a6.876 6.876 0 00-.124 1.289 6.773 6.773 0 006.765 6.765c2.19 0 4.22-1.052 5.49-2.824a3.568 3.568 0 002.207.769 3.603 3.603 0 003.374-4.854A4.785 4.785 0 0024 12.572"/></svg></div>
+</div>
+<div class="slide" id="s3">
+  <div class="sec-wrap">
+    <div class="section-label">Part 1</div>
+    <div class="section-title">Platform Foundation</div>
+    <div class="section-sub">Single stack — O11y, Security, Search</div>
+  </div>
+  <div class="elastic-logo"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M20.345 16.33l-3.959-.926-1.05-2.01 5.177-4.535a3.962 3.962 0 012.559 3.702 4.006 4.006 0 01-2.727 3.77m-2.976 4.68c-.616 0-1.22-.207-1.714-.587l.782-4.077 3.596.841c.115.31.172.642.172.987a2.839 2.839 0 01-2.836 2.836m-2.637-.586a5.92 5.92 0 01-4.908 2.6A5.947 5.947 0 014 15.905l5.167-4.67 5.272 2.403 1.167 2.23zM.928 11.443a4.007 4.007 0 012.726-3.77l3.95.933.927 1.98-5.05 4.565a3.97 3.97 0 01-2.553-3.708m5.703-8.45a2.841 2.841 0 011.723.58l-.789 4.092-3.598-.85a2.842 2.842 0 01-.172-.986A2.84 2.84 0 016.63 2.992m2.66.59A5.92 5.92 0 0120.1 6.93c0 .4-.038.781-.114 1.164l-5.299 4.643-5.251-2.394-1.026-2.19zM24 12.571a4.723 4.723 0 00-3.124-4.454 6.695 6.695 0 00.126-1.29A6.789 6.789 0 0014.22.047 6.769 6.769 0 008.727 2.86a3.586 3.586 0 00-2.204-.754A3.604 3.604 0 003.15 6.959 4.786 4.786 0 000 11.431 4.727 4.727 0 003.139 15.9a6.876 6.876 0 00-.124 1.289 6.773 6.773 0 006.765 6.765c2.19 0 4.22-1.052 5.49-2.824a3.568 3.568 0 002.207.769 3.603 3.603 0 003.374-4.854A4.785 4.785 0 0024 12.572"/></svg></div>
+</div>
+<div class="slide" id="s4">
+  <div class="accent-bar"></div>
+  <div class="hdr"><div class="hdg">Elastic Platform Architecture</div><div class="sub">Single Elasticsearch backend powers all three solutions — data ingested once, available everywhere</div></div>
+  <div class="body col">
+    <div class="platform-banner">Elasticsearch &nbsp;—&nbsp; Kibana &nbsp;—&nbsp; Fleet &nbsp;—&nbsp; Integrations &nbsp;—&nbsp; Machine Learning &nbsp;—&nbsp; AI Assistant</div>
+    <div class="three-cols" style="margin-top:16px;flex:1">
+      <div class="col-card" style="border-top:4px solid #F04E98"><div class="col-head" style="color:#F04E98">Observability</div><div class="col-body">Log analytics, APM, Infrastructure, RUM, Synthetics, AIOps, LLM observability, Universal Profiling</div></div>
+      <div class="col-card" style="border-top:4px solid #FA744E"><div class="col-head" style="color:#FA744E">Security</div><div class="col-body">SIEM, Endpoint security, XDR, Cloud security (CSPM/KSPM), Threat intelligence, Detection rules</div></div>
+      <div class="col-card" style="border-top:4px solid #FEC514"><div class="col-head" style="color:#FEC514">Search</div><div class="col-body">App search, Workplace search, Vector search, Semantic search, RAG, Ecommerce search</div></div>
+    </div>
+  </div>
+  <div class="elastic-logo"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M20.345 16.33l-3.959-.926-1.05-2.01 5.177-4.535a3.962 3.962 0 012.559 3.702 4.006 4.006 0 01-2.727 3.77m-2.976 4.68c-.616 0-1.22-.207-1.714-.587l.782-4.077 3.596.841c.115.31.172.642.172.987a2.839 2.839 0 01-2.836 2.836m-2.637-.586a5.92 5.92 0 01-4.908 2.6A5.947 5.947 0 014 15.905l5.167-4.67 5.272 2.403 1.167 2.23zM.928 11.443a4.007 4.007 0 012.726-3.77l3.95.933.927 1.98-5.05 4.565a3.97 3.97 0 01-2.553-3.708m5.703-8.45a2.841 2.841 0 011.723.58l-.789 4.092-3.598-.85a2.842 2.842 0 01-.172-.986A2.84 2.84 0 016.63 2.992m2.66.59A5.92 5.92 0 0120.1 6.93c0 .4-.038.781-.114 1.164l-5.299 4.643-5.251-2.394-1.026-2.19zM24 12.571a4.723 4.723 0 00-3.124-4.454 6.695 6.695 0 00.126-1.29A6.789 6.789 0 0014.22.047 6.769 6.769 0 008.727 2.86a3.586 3.586 0 00-2.204-.754A3.604 3.604 0 003.15 6.959 4.786 4.786 0 000 11.431 4.727 4.727 0 003.139 15.9a6.876 6.876 0 00-.124 1.289 6.773 6.773 0 006.765 6.765c2.19 0 4.22-1.052 5.49-2.824a3.568 3.568 0 002.207.769 3.603 3.603 0 003.374-4.854A4.785 4.785 0 0024 12.572"/></svg></div>
+</div>
+<div class="slide" id="s5">
+  <div class="accent-bar"></div>
+  <div class="hdr"><div class="hdg">The Convergence Story</div><div class="sub">Elasticsearch started as search — O11y and Security teams discovered the same data held their answers</div></div>
+  <div class="body col">
+    <div class="conv-grid">
+      <div class="conv-box"><div class="conv-num">1</div><div class="conv-title">Origins: Search Engine</div><div class="conv-desc">Elasticsearch becomes the most popular Java OSS project. Teams use it to search through logs instead of grep.</div></div>
+      <div class="conv-arrow">→</div>
+      <div class="conv-box"><div class="conv-num">2</div><div class="conv-title">Observability Emerges</div><div class="conv-desc">Log analytics expands into APM, metrics, traces. Out-of-the-box capabilities for SRE and DevOps teams.</div></div>
+      <div class="conv-box"><div class="conv-num">3</div><div class="conv-title">Security Joins</div><div class="conv-desc">SIEM, endpoint protection, cloud security. Same log data used for threat hunting and detection.</div></div>
+      <div class="conv-arrow">→</div>
+      <div class="conv-box"><div class="conv-num">4</div><div class="conv-title">Unified Platform</div><div class="conv-desc">Same data serves both O11y and Security. ECS normalises everything. AI-powered workflows span both domains.</div></div>
+    </div>
+    <div class="insight-bar">Key Insight: Data Ingested Once — Used for Both Observability and Security</div>
+  </div>
+  <div class="elastic-logo"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M20.345 16.33l-3.959-.926-1.05-2.01 5.177-4.535a3.962 3.962 0 012.559 3.702 4.006 4.006 0 01-2.727 3.77m-2.976 4.68c-.616 0-1.22-.207-1.714-.587l.782-4.077 3.596.841c.115.31.172.642.172.987a2.839 2.839 0 01-2.836 2.836m-2.637-.586a5.92 5.92 0 01-4.908 2.6A5.947 5.947 0 014 15.905l5.167-4.67 5.272 2.403 1.167 2.23zM.928 11.443a4.007 4.007 0 012.726-3.77l3.95.933.927 1.98-5.05 4.565a3.97 3.97 0 01-2.553-3.708m5.703-8.45a2.841 2.841 0 011.723.58l-.789 4.092-3.598-.85a2.842 2.842 0 01-.172-.986A2.84 2.84 0 016.63 2.992m2.66.59A5.92 5.92 0 0120.1 6.93c0 .4-.038.781-.114 1.164l-5.299 4.643-5.251-2.394-1.026-2.19zM24 12.571a4.723 4.723 0 00-3.124-4.454 6.695 6.695 0 00.126-1.29A6.789 6.789 0 0014.22.047 6.769 6.769 0 008.727 2.86a3.586 3.586 0 00-2.204-.754A3.604 3.604 0 003.15 6.959 4.786 4.786 0 000 11.431 4.727 4.727 0 003.139 15.9a6.876 6.876 0 00-.124 1.289 6.773 6.773 0 006.765 6.765c2.19 0 4.22-1.052 5.49-2.824a3.568 3.568 0 002.207.769 3.603 3.603 0 003.374-4.854A4.785 4.785 0 0024 12.572"/></svg></div>
+</div>
+<div class="slide" id="s6">
+  <div class="sec-wrap">
+    <div class="section-label">Part 2</div>
+    <div class="section-title">Unified Data Collection</div>
+    <div class="section-sub">Elastic Agent and Fleet</div>
+  </div>
+  <div class="elastic-logo"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M20.345 16.33l-3.959-.926-1.05-2.01 5.177-4.535a3.962 3.962 0 012.559 3.702 4.006 4.006 0 01-2.727 3.77m-2.976 4.68c-.616 0-1.22-.207-1.714-.587l.782-4.077 3.596.841c.115.31.172.642.172.987a2.839 2.839 0 01-2.836 2.836m-2.637-.586a5.92 5.92 0 01-4.908 2.6A5.947 5.947 0 014 15.905l5.167-4.67 5.272 2.403 1.167 2.23zM.928 11.443a4.007 4.007 0 012.726-3.77l3.95.933.927 1.98-5.05 4.565a3.97 3.97 0 01-2.553-3.708m5.703-8.45a2.841 2.841 0 011.723.58l-.789 4.092-3.598-.85a2.842 2.842 0 01-.172-.986A2.84 2.84 0 016.63 2.992m2.66.59A5.92 5.92 0 0120.1 6.93c0 .4-.038.781-.114 1.164l-5.299 4.643-5.251-2.394-1.026-2.19zM24 12.571a4.723 4.723 0 00-3.124-4.454 6.695 6.695 0 00.126-1.29A6.789 6.789 0 0014.22.047 6.769 6.769 0 008.727 2.86a3.586 3.586 0 00-2.204-.754A3.604 3.604 0 003.15 6.959 4.786 4.786 0 000 11.431 4.727 4.727 0 003.139 15.9a6.876 6.876 0 00-.124 1.289 6.773 6.773 0 006.765 6.765c2.19 0 4.22-1.052 5.49-2.824a3.568 3.568 0 002.207.769 3.603 3.603 0 003.374-4.854A4.785 4.785 0 0024 12.572"/></svg></div>
+</div>
+<div class="slide" id="s7">
+  <div class="accent-bar"></div>
+  <div class="hdr"><div class="hdg">Elastic Agent: Single Agent, Unified Telemetry</div><div class="sub">One agent per host collects logs, metrics, traces, and security data — eliminating the need for separate collectors</div></div>
+  <div class="body col">
+    <div class="sub-note">All five telemetry signals flow to Elasticsearch — normalised by ECS, available to both Observability and Security apps</div>
+    <div class="signal-grid">
+      <div class="sig-card"><div class="sig-icon">📋</div><div class="sig-name">Logs</div><div class="sig-desc">Application, system, security, audit logs — collected from all sources</div></div>
+      <div class="sig-card"><div class="sig-icon">📊</div><div class="sig-name">Metrics</div><div class="sig-desc">Host, application, network, and infrastructure performance metrics</div></div>
+      <div class="sig-card"><div class="sig-icon">🔗</div><div class="sig-name">Traces</div><div class="sig-desc">Distributed tracing via OTel — request flows across microservices</div></div>
+      <div class="sig-card"><div class="sig-icon">🛡️</div><div class="sig-name">Security Events</div><div class="sig-desc">Endpoint, network, process, file, registry events for threat detection</div></div>
+      <div class="sig-card"><div class="sig-icon">⚡</div><div class="sig-name">Profiles</div><div class="sig-desc">Universal Profiling — code-level visibility without instrumentation</div></div>
+    </div>
+  </div>
+  <div class="elastic-logo"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M20.345 16.33l-3.959-.926-1.05-2.01 5.177-4.535a3.962 3.962 0 012.559 3.702 4.006 4.006 0 01-2.727 3.77m-2.976 4.68c-.616 0-1.22-.207-1.714-.587l.782-4.077 3.596.841c.115.31.172.642.172.987a2.839 2.839 0 01-2.836 2.836m-2.637-.586a5.92 5.92 0 01-4.908 2.6A5.947 5.947 0 014 15.905l5.167-4.67 5.272 2.403 1.167 2.23zM.928 11.443a4.007 4.007 0 012.726-3.77l3.95.933.927 1.98-5.05 4.565a3.97 3.97 0 01-2.553-3.708m5.703-8.45a2.841 2.841 0 011.723.58l-.789 4.092-3.598-.85a2.842 2.842 0 01-.172-.986A2.84 2.84 0 016.63 2.992m2.66.59A5.92 5.92 0 0120.1 6.93c0 .4-.038.781-.114 1.164l-5.299 4.643-5.251-2.394-1.026-2.19zM24 12.571a4.723 4.723 0 00-3.124-4.454 6.695 6.695 0 00.126-1.29A6.789 6.789 0 0014.22.047 6.769 6.769 0 008.727 2.86a3.586 3.586 0 00-2.204-.754A3.604 3.604 0 003.15 6.959 4.786 4.786 0 000 11.431 4.727 4.727 0 003.139 15.9a6.876 6.876 0 00-.124 1.289 6.773 6.773 0 006.765 6.765c2.19 0 4.22-1.052 5.49-2.824a3.568 3.568 0 002.207.769 3.603 3.603 0 003.374-4.854A4.785 4.785 0 0024 12.572"/></svg></div>
+</div>
+<div class="slide" id="s8">
+  <div class="accent-bar"></div>
+  <div class="hdr"><div class="hdg">Fleet: Centralised Agent Management</div><div class="sub">Deploy and manage thousands of agents from a single UI — policies for O11y and Security applied simultaneously</div></div>
+  <div class="body col">
+    <div class="two-cols">
+      <div class="info-card"><div class="ic-title">Centralised Policy Management</div><div class="ic-body">Define and push agent policies from a web UI. Combine O11y integrations (APM, metrics) with Security integrations (Endpoint). One policy for both domains — no duplicate configuration.</div></div>
+      <div class="info-card"><div class="ic-title">Out-of-the-Box Integrations</div><div class="ic-body">400+ prebuilt integrations with dashboards, visualisations, and ingest pipelines. Data automatically mapped to ECS. One-click deployment from the Fleet UI.</div></div>
+    </div>
+    <div class="insight-bar" style="margin-top:14px">Fleet enables the 'land and expand' pattern — start with logs, add metrics, then security, all from the same agent.<br><small style="font-weight:400">No separate agents. No conflicting configurations. No duplicate data.</small></div>
+  </div>
+  <div class="elastic-logo"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M20.345 16.33l-3.959-.926-1.05-2.01 5.177-4.535a3.962 3.962 0 012.559 3.702 4.006 4.006 0 01-2.727 3.77m-2.976 4.68c-.616 0-1.22-.207-1.714-.587l.782-4.077 3.596.841c.115.31.172.642.172.987a2.839 2.839 0 01-2.836 2.836m-2.637-.586a5.92 5.92 0 01-4.908 2.6A5.947 5.947 0 014 15.905l5.167-4.67 5.272 2.403 1.167 2.23zM.928 11.443a4.007 4.007 0 012.726-3.77l3.95.933.927 1.98-5.05 4.565a3.97 3.97 0 01-2.553-3.708m5.703-8.45a2.841 2.841 0 011.723.58l-.789 4.092-3.598-.85a2.842 2.842 0 01-.172-.986A2.84 2.84 0 016.63 2.992m2.66.59A5.92 5.92 0 0120.1 6.93c0 .4-.038.781-.114 1.164l-5.299 4.643-5.251-2.394-1.026-2.19zM24 12.571a4.723 4.723 0 00-3.124-4.454 6.695 6.695 0 00.126-1.29A6.789 6.789 0 0014.22.047 6.769 6.769 0 008.727 2.86a3.586 3.586 0 00-2.204-.754A3.604 3.604 0 003.15 6.959 4.786 4.786 0 000 11.431 4.727 4.727 0 003.139 15.9a6.876 6.876 0 00-.124 1.289 6.773 6.773 0 006.765 6.765c2.19 0 4.22-1.052 5.49-2.824a3.568 3.568 0 002.207.769 3.603 3.603 0 003.374-4.854A4.785 4.785 0 0024 12.572"/></svg></div>
+</div>
+<div class="slide" id="s9">
+  <div class="sec-wrap">
+    <div class="section-label">Part 3</div>
+    <div class="section-title">ECS &amp; Streams</div>
+    <div class="section-sub">The common data language and AI-powered log management</div>
+  </div>
+  <div class="elastic-logo"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M20.345 16.33l-3.959-.926-1.05-2.01 5.177-4.535a3.962 3.962 0 012.559 3.702 4.006 4.006 0 01-2.727 3.77m-2.976 4.68c-.616 0-1.22-.207-1.714-.587l.782-4.077 3.596.841c.115.31.172.642.172.987a2.839 2.839 0 01-2.836 2.836m-2.637-.586a5.92 5.92 0 01-4.908 2.6A5.947 5.947 0 014 15.905l5.167-4.67 5.272 2.403 1.167 2.23zM.928 11.443a4.007 4.007 0 012.726-3.77l3.95.933.927 1.98-5.05 4.565a3.97 3.97 0 01-2.553-3.708m5.703-8.45a2.841 2.841 0 011.723.58l-.789 4.092-3.598-.85a2.842 2.842 0 01-.172-.986A2.84 2.84 0 016.63 2.992m2.66.59A5.92 5.92 0 0120.1 6.93c0 .4-.038.781-.114 1.164l-5.299 4.643-5.251-2.394-1.026-2.19zM24 12.571a4.723 4.723 0 00-3.124-4.454 6.695 6.695 0 00.126-1.29A6.789 6.789 0 0014.22.047 6.769 6.769 0 008.727 2.86a3.586 3.586 0 00-2.204-.754A3.604 3.604 0 003.15 6.959 4.786 4.786 0 000 11.431 4.727 4.727 0 003.139 15.9a6.876 6.876 0 00-.124 1.289 6.773 6.773 0 006.765 6.765c2.19 0 4.22-1.052 5.49-2.824a3.568 3.568 0 002.207.769 3.603 3.603 0 003.374-4.854A4.785 4.785 0 0024 12.572"/></svg></div>
+</div>
+<div class="slide" id="s10">
+  <div class="accent-bar"></div>
+  <div class="hdr"><div class="hdg">Elastic Common Schema (ECS)</div><div class="sub">The open-source specification that makes O11y and Security data interoperable — the single biggest enabler of cross-domain analytics</div></div>
+  <div class="body col">
+    <div class="three-cols" style="flex:0 0 auto">
+      <div class="col-card"><div class="col-head">Standardised Fields</div><div class="col-body">@timestamp, event.*, host.*, source.*, destination.*, user.*, process.* — same names, same types, everywhere. All Elastic Agent integrations auto-map to ECS.</div></div>
+      <div class="col-card"><div class="col-head">Cross-Domain Content</div><div class="col-body">Dashboards, detection rules, and ML jobs work across any ECS-compliant data. A security rule can run on O11y data. An APM dashboard can include security context.</div></div>
+      <div class="col-card"><div class="col-head">OpenTelemetry Convergence</div><div class="col-body">ECS donated to OpenTelemetry (2023). ECS and OTel Semantic Conventions converging into a single open schema for both O11y and Security.</div></div>
+    </div>
+    <div class="ecs-fields">
+      <div class="ecs-col"><div class="ecs-head">Security-Required ECS Fields</div><code>@timestamp &nbsp; ecs.version &nbsp; event.kind &nbsp; event.category<br>host.name &nbsp; host.id &nbsp; process.name &nbsp; process.pid<br>source.ip &nbsp; destination.ip &nbsp; user.name &nbsp; user.id</code></div>
+      <div class="ecs-col"><div class="ecs-head">O11y Fields Also Standardised</div><code>service.name &nbsp; trace.id &nbsp; transaction.id<br>http.request.method &nbsp; http.response.status_code<br>log.level &nbsp; error.message &nbsp; container.id</code></div>
+    </div>
+  </div>
+  <div class="elastic-logo"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M20.345 16.33l-3.959-.926-1.05-2.01 5.177-4.535a3.962 3.962 0 012.559 3.702 4.006 4.006 0 01-2.727 3.77m-2.976 4.68c-.616 0-1.22-.207-1.714-.587l.782-4.077 3.596.841c.115.31.172.642.172.987a2.839 2.839 0 01-2.836 2.836m-2.637-.586a5.92 5.92 0 01-4.908 2.6A5.947 5.947 0 014 15.905l5.167-4.67 5.272 2.403 1.167 2.23zM.928 11.443a4.007 4.007 0 012.726-3.77l3.95.933.927 1.98-5.05 4.565a3.97 3.97 0 01-2.553-3.708m5.703-8.45a2.841 2.841 0 011.723.58l-.789 4.092-3.598-.85a2.842 2.842 0 01-.172-.986A2.84 2.84 0 016.63 2.992m2.66.59A5.92 5.92 0 0120.1 6.93c0 .4-.038.781-.114 1.164l-5.299 4.643-5.251-2.394-1.026-2.19zM24 12.571a4.723 4.723 0 00-3.124-4.454 6.695 6.695 0 00.126-1.29A6.789 6.789 0 0014.22.047 6.769 6.769 0 008.727 2.86a3.586 3.586 0 00-2.204-.754A3.604 3.604 0 003.15 6.959 4.786 4.786 0 000 11.431 4.727 4.727 0 003.139 15.9a6.876 6.876 0 00-.124 1.289 6.773 6.773 0 006.765 6.765c2.19 0 4.22-1.052 5.49-2.824a3.568 3.568 0 002.207.769 3.603 3.603 0 003.374-4.854A4.785 4.785 0 0024 12.572"/></svg></div>
+</div>
+<div class="slide" id="s11">
+  <div class="sec-wrap">
+    <div class="section-label">Part 3 cont.</div>
+    <div class="section-title">Streams</div>
+    <div class="section-sub">AI-powered log management for O11y and Security</div>
+  </div>
+  <div class="elastic-logo"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M20.345 16.33l-3.959-.926-1.05-2.01 5.177-4.535a3.962 3.962 0 012.559 3.702 4.006 4.006 0 01-2.727 3.77m-2.976 4.68c-.616 0-1.22-.207-1.714-.587l.782-4.077 3.596.841c.115.31.172.642.172.987a2.839 2.839 0 01-2.836 2.836m-2.637-.586a5.92 5.92 0 01-4.908 2.6A5.947 5.947 0 014 15.905l5.167-4.67 5.272 2.403 1.167 2.23zM.928 11.443a4.007 4.007 0 012.726-3.77l3.95.933.927 1.98-5.05 4.565a3.97 3.97 0 01-2.553-3.708m5.703-8.45a2.841 2.841 0 011.723.58l-.789 4.092-3.598-.85a2.842 2.842 0 01-.172-.986A2.84 2.84 0 016.63 2.992m2.66.59A5.92 5.92 0 0120.1 6.93c0 .4-.038.781-.114 1.164l-5.299 4.643-5.251-2.394-1.026-2.19zM24 12.571a4.723 4.723 0 00-3.124-4.454 6.695 6.695 0 00.126-1.29A6.789 6.789 0 0014.22.047 6.769 6.769 0 008.727 2.86a3.586 3.586 0 00-2.204-.754A3.604 3.604 0 003.15 6.959 4.786 4.786 0 000 11.431 4.727 4.727 0 003.139 15.9a6.876 6.876 0 00-.124 1.289 6.773 6.773 0 006.765 6.765c2.19 0 4.22-1.052 5.49-2.824a3.568 3.568 0 002.207.769 3.603 3.603 0 003.374-4.854A4.785 4.785 0 0024 12.572"/></svg></div>
+</div>
+<div class="slide" id="s12">
+  <div class="accent-bar"></div>
+  <div class="hdr"><div class="hdg">Streams: From Chaos to Clarity</div><div class="sub">Streams uses agentic AI to parse, partition, and structure logs — making them immediately usable for both observability and security</div></div>
+  <div class="body">
+    <div class="two-by-two">
+      <div class="info-card"><div class="ic-title">AI-Powered Parsing &amp; Partitioning</div><div class="ic-body">AI automatically detects log patterns and generates GROK rules. Partitions logs by service, component, or type without manual pipeline configuration.</div></div>
+      <div class="info-card"><div class="ic-title">Significant Events Detection</div><div class="ic-body">Agentic AI surfaces critical events: out-of-memory errors, server crashes, startup/shutdown events, anomalies, certificate expiry warnings.</div></div>
+      <div class="info-card"><div class="ic-title">Agentless Ingest</div><div class="ic-body">Send any log from any source directly to /logs endpoint. Works with OpenTelemetry, Fluentd, Fluent Bit, or any forwarder — no pipeline config needed.</div></div>
+      <div class="info-card"><div class="ic-title">Dual-Domain Value</div><div class="ic-body">For O11y: find the 'why' behind incidents faster. For Security: structured logs feed SIEM detections, threat hunting queries, and compliance audits.</div></div>
+    </div>
+  </div>
+  <div class="bottom-insight">Streams bridges the O11y–Security gap: same AI-parsed logs inform both SRE investigations and SOC threat hunts</div>
+  <div class="elastic-logo"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M20.345 16.33l-3.959-.926-1.05-2.01 5.177-4.535a3.962 3.962 0 012.559 3.702 4.006 4.006 0 01-2.727 3.77m-2.976 4.68c-.616 0-1.22-.207-1.714-.587l.782-4.077 3.596.841c.115.31.172.642.172.987a2.839 2.839 0 01-2.836 2.836m-2.637-.586a5.92 5.92 0 01-4.908 2.6A5.947 5.947 0 014 15.905l5.167-4.67 5.272 2.403 1.167 2.23zM.928 11.443a4.007 4.007 0 012.726-3.77l3.95.933.927 1.98-5.05 4.565a3.97 3.97 0 01-2.553-3.708m5.703-8.45a2.841 2.841 0 011.723.58l-.789 4.092-3.598-.85a2.842 2.842 0 01-.172-.986A2.84 2.84 0 016.63 2.992m2.66.59A5.92 5.92 0 0120.1 6.93c0 .4-.038.781-.114 1.164l-5.299 4.643-5.251-2.394-1.026-2.19zM24 12.571a4.723 4.723 0 00-3.124-4.454 6.695 6.695 0 00.126-1.29A6.789 6.789 0 0014.22.047 6.769 6.769 0 008.727 2.86a3.586 3.586 0 00-2.204-.754A3.604 3.604 0 003.15 6.959 4.786 4.786 0 000 11.431 4.727 4.727 0 003.139 15.9a6.876 6.876 0 00-.124 1.289 6.773 6.773 0 006.765 6.765c2.19 0 4.22-1.052 5.49-2.824a3.568 3.568 0 002.207.769 3.603 3.603 0 003.374-4.854A4.785 4.785 0 0024 12.572"/></svg></div>
+</div>
+<div class="slide" id="s13">
+  <div class="sec-wrap">
+    <div class="section-label">Part 4</div>
+    <div class="section-title">Unified Telemetry Pipeline</div>
+    <div class="section-sub">OpenTelemetry + ECS — data flows once, serves all</div>
+  </div>
+  <div class="elastic-logo"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M20.345 16.33l-3.959-.926-1.05-2.01 5.177-4.535a3.962 3.962 0 012.559 3.702 4.006 4.006 0 01-2.727 3.77m-2.976 4.68c-.616 0-1.22-.207-1.714-.587l.782-4.077 3.596.841c.115.31.172.642.172.987a2.839 2.839 0 01-2.836 2.836m-2.637-.586a5.92 5.92 0 01-4.908 2.6A5.947 5.947 0 014 15.905l5.167-4.67 5.272 2.403 1.167 2.23zM.928 11.443a4.007 4.007 0 012.726-3.77l3.95.933.927 1.98-5.05 4.565a3.97 3.97 0 01-2.553-3.708m5.703-8.45a2.841 2.841 0 011.723.58l-.789 4.092-3.598-.85a2.842 2.842 0 01-.172-.986A2.84 2.84 0 016.63 2.992m2.66.59A5.92 5.92 0 0120.1 6.93c0 .4-.038.781-.114 1.164l-5.299 4.643-5.251-2.394-1.026-2.19zM24 12.571a4.723 4.723 0 00-3.124-4.454 6.695 6.695 0 00.126-1.29A6.789 6.789 0 0014.22.047 6.769 6.769 0 008.727 2.86a3.586 3.586 0 00-2.204-.754A3.604 3.604 0 003.15 6.959 4.786 4.786 0 000 11.431 4.727 4.727 0 003.139 15.9a6.876 6.876 0 00-.124 1.289 6.773 6.773 0 006.765 6.765c2.19 0 4.22-1.052 5.49-2.824a3.568 3.568 0 002.207.769 3.603 3.603 0 003.374-4.854A4.785 4.785 0 0024 12.572"/></svg></div>
+</div>
+<div class="slide" id="s14">
+  <div class="accent-bar"></div>
+  <div class="hdr"><div class="hdg">The Unified Telemetry Pipeline</div><div class="sub">All data flows through open standards to a single platform — O11y and Security tools query the same Elasticsearch indices</div></div>
+  <div class="body col">
+    <div class="pipeline-row">
+      <div class="pipe-box dark"><div class="pipe-label">DATA SOURCES</div><div class="pipe-sub">Apps, hosts, network, cloud, endpoints, containers</div></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-box"><div class="pipe-label" style="color:#0B64DD">COLLECTION</div><div class="pipe-sub">Elastic Agent + OTel Collector + any forwarder</div></div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-box"><div class="pipe-label" style="color:#0B64DD">NORMALISATION</div><div class="pipe-sub">ECS + OTel SemConv — unified schema for all data</div></div>
+    </div>
+    <div class="pipe-down">↓ &nbsp; shared Elasticsearch indices &nbsp; ↓</div>
+    <div class="two-cols">
+      <div class="col-card" style="border-top:4px solid #F04E98"><div class="col-head" style="color:#F04E98">Observability Apps</div><div class="col-body">APM · Infrastructure · Logs · RUM<br>Synthetics · AIOps · Profiling<br>LLM Observability</div></div>
+      <div class="col-card" style="border-top:4px solid #FA744E"><div class="col-head" style="color:#FA744E">Security Apps</div><div class="col-body">SIEM · Endpoint · XDR · CSPM<br>Detection Rules · Threat Hunting<br>Cases · Timeline</div></div>
+    </div>
+  </div>
+  <div class="elastic-logo"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M20.345 16.33l-3.959-.926-1.05-2.01 5.177-4.535a3.962 3.962 0 012.559 3.702 4.006 4.006 0 01-2.727 3.77m-2.976 4.68c-.616 0-1.22-.207-1.714-.587l.782-4.077 3.596.841c.115.31.172.642.172.987a2.839 2.839 0 01-2.836 2.836m-2.637-.586a5.92 5.92 0 01-4.908 2.6A5.947 5.947 0 014 15.905l5.167-4.67 5.272 2.403 1.167 2.23zM.928 11.443a4.007 4.007 0 012.726-3.77l3.95.933.927 1.98-5.05 4.565a3.97 3.97 0 01-2.553-3.708m5.703-8.45a2.841 2.841 0 011.723.58l-.789 4.092-3.598-.85a2.842 2.842 0 01-.172-.986A2.84 2.84 0 016.63 2.992m2.66.59A5.92 5.92 0 0120.1 6.93c0 .4-.038.781-.114 1.164l-5.299 4.643-5.251-2.394-1.026-2.19zM24 12.571a4.723 4.723 0 00-3.124-4.454 6.695 6.695 0 00.126-1.29A6.789 6.789 0 0014.22.047 6.769 6.769 0 008.727 2.86a3.586 3.586 0 00-2.204-.754A3.604 3.604 0 003.15 6.959 4.786 4.786 0 000 11.431 4.727 4.727 0 003.139 15.9a6.876 6.876 0 00-.124 1.289 6.773 6.773 0 006.765 6.765c2.19 0 4.22-1.052 5.49-2.824a3.568 3.568 0 002.207.769 3.603 3.603 0 003.374-4.854A4.785 4.785 0 0024 12.572"/></svg></div>
+</div>
+<div class="slide" id="s15">
+  <div class="accent-bar"></div>
+  <div class="hdr"><div class="hdg">Four Pillars of Modern Observability</div><div class="sub">Each telemetry pillar serves both O11y and Security use cases — the data is the same, the questions differ</div></div>
+  <div class="body">
+    <div class="four-cols">
+      <div class="pillar-card"><div class="pillar-name">Logs</div><div class="pillar-tag">The "why" signal</div><div class="pillar-o11y"><strong>O11y:</strong> Root cause analysis, error investigation, audit trails</div><div class="pillar-sec"><strong>Security:</strong> Threat detection, forensic investigation, compliance evidence</div></div>
+      <div class="pillar-card"><div class="pillar-name">Metrics</div><div class="pillar-tag">The "what" signal</div><div class="pillar-o11y"><strong>O11y:</strong> CPU, memory, latency, throughput, SLOs</div><div class="pillar-sec"><strong>Security:</strong> Anomaly baselines, DoS indicators, resource abuse patterns</div></div>
+      <div class="pillar-card"><div class="pillar-name">Traces</div><div class="pillar-tag">The "where" signal</div><div class="pillar-o11y"><strong>O11y:</strong> Request flows, latency bottlenecks, service dependencies</div><div class="pillar-sec"><strong>Security:</strong> Attack path tracing, lateral movement detection</div></div>
+      <div class="pillar-card"><div class="pillar-name">Profiles</div><div class="pillar-tag">The "how much" signal</div><div class="pillar-o11y"><strong>O11y:</strong> Code-level CPU optimisation, memory leaks</div><div class="pillar-sec"><strong>Security:</strong> Cryptomining detection, code injection, zero-day exploit patterns</div></div>
+    </div>
+  </div>
+  <div class="elastic-logo"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M20.345 16.33l-3.959-.926-1.05-2.01 5.177-4.535a3.962 3.962 0 012.559 3.702 4.006 4.006 0 01-2.727 3.77m-2.976 4.68c-.616 0-1.22-.207-1.714-.587l.782-4.077 3.596.841c.115.31.172.642.172.987a2.839 2.839 0 01-2.836 2.836m-2.637-.586a5.92 5.92 0 01-4.908 2.6A5.947 5.947 0 014 15.905l5.167-4.67 5.272 2.403 1.167 2.23zM.928 11.443a4.007 4.007 0 012.726-3.77l3.95.933.927 1.98-5.05 4.565a3.97 3.97 0 01-2.553-3.708m5.703-8.45a2.841 2.841 0 011.723.58l-.789 4.092-3.598-.85a2.842 2.842 0 01-.172-.986A2.84 2.84 0 016.63 2.992m2.66.59A5.92 5.92 0 0120.1 6.93c0 .4-.038.781-.114 1.164l-5.299 4.643-5.251-2.394-1.026-2.19zM24 12.571a4.723 4.723 0 00-3.124-4.454 6.695 6.695 0 00.126-1.29A6.789 6.789 0 0014.22.047 6.769 6.769 0 008.727 2.86a3.586 3.586 0 00-2.204-.754A3.604 3.604 0 003.15 6.959 4.786 4.786 0 000 11.431 4.727 4.727 0 003.139 15.9a6.876 6.876 0 00-.124 1.289 6.773 6.773 0 006.765 6.765c2.19 0 4.22-1.052 5.49-2.824a3.568 3.568 0 002.207.769 3.603 3.603 0 003.374-4.854A4.785 4.785 0 0024 12.572"/></svg></div>
+</div>
+<div class="slide" id="s16">
+  <div class="sec-wrap">
+    <div class="section-label">Part 5</div>
+    <div class="section-title">Cross-Domain Patterns</div>
+    <div class="section-sub">O11y-driven security and security-informed operations</div>
+  </div>
+  <div class="elastic-logo"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M20.345 16.33l-3.959-.926-1.05-2.01 5.177-4.535a3.962 3.962 0 012.559 3.702 4.006 4.006 0 01-2.727 3.77m-2.976 4.68c-.616 0-1.22-.207-1.714-.587l.782-4.077 3.596.841c.115.31.172.642.172.987a2.839 2.839 0 01-2.836 2.836m-2.637-.586a5.92 5.92 0 01-4.908 2.6A5.947 5.947 0 014 15.905l5.167-4.67 5.272 2.403 1.167 2.23zM.928 11.443a4.007 4.007 0 012.726-3.77l3.95.933.927 1.98-5.05 4.565a3.97 3.97 0 01-2.553-3.708m5.703-8.45a2.841 2.841 0 011.723.58l-.789 4.092-3.598-.85a2.842 2.842 0 01-.172-.986A2.84 2.84 0 016.63 2.992m2.66.59A5.92 5.92 0 0120.1 6.93c0 .4-.038.781-.114 1.164l-5.299 4.643-5.251-2.394-1.026-2.19zM24 12.571a4.723 4.723 0 00-3.124-4.454 6.695 6.695 0 00.126-1.29A6.789 6.789 0 0014.22.047 6.769 6.769 0 008.727 2.86a3.586 3.586 0 00-2.204-.754A3.604 3.604 0 003.15 6.959 4.786 4.786 0 000 11.431 4.727 4.727 0 003.139 15.9a6.876 6.876 0 00-.124 1.289 6.773 6.773 0 006.765 6.765c2.19 0 4.22-1.052 5.49-2.824a3.568 3.568 0 002.207.769 3.603 3.603 0 003.374-4.854A4.785 4.785 0 0024 12.572"/></svg></div>
+</div>
+<div class="slide" id="s17">
+  <div class="accent-bar"></div>
+  <div class="hdr"><div class="hdg">Pattern 1: Observability-Driven Security</div><div class="sub">Using O11y data to detect, investigate, and respond to security threats in real time</div></div>
+  <div class="body col">
+    <div class="steps-flow">
+      <div class="step-row"><div class="step-num">1</div><div class="step-content"><div class="step-title">Alert Fires</div><div class="step-desc">Unusual network traffic spike detected by O11y monitoring — potential DoS attack signal</div></div><div class="step-arr">→</div></div>
+      <div class="step-row"><div class="step-num">2</div><div class="step-content"><div class="step-title">Streams Auto-Parses Logs</div><div class="step-desc">AI structures raw network and application logs — surfaces significant events and error patterns</div></div><div class="step-arr">→</div></div>
+      <div class="step-row"><div class="step-num">3</div><div class="step-content"><div class="step-title">Cross-Correlation</div><div class="step-desc">SIEM detection rules run on ECS-normalised data. Trace analysis reveals lateral movement. Security analyst joins the O11y incident.</div></div><div class="step-arr">→</div></div>
+      <div class="step-row"><div class="step-num">4</div><div class="step-content"><div class="step-title">Root Cause Identified &amp; Contained</div><div class="step-desc">Case created spanning O11y evidence and security findings. Automated response workflow triggered. MTTR reduced by 60–80%.</div></div></div>
+    </div>
+  </div>
+  <div class="elastic-logo"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M20.345 16.33l-3.959-.926-1.05-2.01 5.177-4.535a3.962 3.962 0 012.559 3.702 4.006 4.006 0 01-2.727 3.77m-2.976 4.68c-.616 0-1.22-.207-1.714-.587l.782-4.077 3.596.841c.115.31.172.642.172.987a2.839 2.839 0 01-2.836 2.836m-2.637-.586a5.92 5.92 0 01-4.908 2.6A5.947 5.947 0 014 15.905l5.167-4.67 5.272 2.403 1.167 2.23zM.928 11.443a4.007 4.007 0 012.726-3.77l3.95.933.927 1.98-5.05 4.565a3.97 3.97 0 01-2.553-3.708m5.703-8.45a2.841 2.841 0 011.723.58l-.789 4.092-3.598-.85a2.842 2.842 0 01-.172-.986A2.84 2.84 0 016.63 2.992m2.66.59A5.92 5.92 0 0120.1 6.93c0 .4-.038.781-.114 1.164l-5.299 4.643-5.251-2.394-1.026-2.19zM24 12.571a4.723 4.723 0 00-3.124-4.454 6.695 6.695 0 00.126-1.29A6.789 6.789 0 0014.22.047 6.769 6.769 0 008.727 2.86a3.586 3.586 0 00-2.204-.754A3.604 3.604 0 003.15 6.959 4.786 4.786 0 000 11.431 4.727 4.727 0 003.139 15.9a6.876 6.876 0 00-.124 1.289 6.773 6.773 0 006.765 6.765c2.19 0 4.22-1.052 5.49-2.824a3.568 3.568 0 002.207.769 3.603 3.603 0 003.374-4.854A4.785 4.785 0 0024 12.572"/></svg></div>
+</div>
+<div class="slide" id="s18">
+  <div class="accent-bar"></div>
+  <div class="hdr"><div class="hdg">Pattern 2: Security-Informed Operations</div><div class="sub">Security context enriches operational decisions — the same platform provides both perspectives</div></div>
+  <div class="body">
+    <div class="two-by-two">
+      <div class="info-card"><div class="ic-title">Vulnerability-Informed Deployment</div><div class="ic-body">Cloud Security Posture Management (CSPM) findings feed into deployment decisions. A vulnerable container image is flagged before it reaches production.</div></div>
+      <div class="info-card"><div class="ic-title">UEBA-Enhanced Performance Monitoring</div><div class="ic-body">User Entity Behaviour Analytics (UEBA) enriches APM data. Unusual user access patterns that look like performance issues are revealed as security events.</div></div>
+      <div class="info-card"><div class="ic-title">Compliance-Aware SLOs</div><div class="ic-body">Service Level Objectives informed by compliance posture. A service running on non-compliant infrastructure automatically triggers a review workflow.</div></div>
+      <div class="info-card"><div class="ic-title">Unified Incident Response</div><div class="ic-body">Cases in Elastic span both domains. An incident starts as an O11y alert, escalates to Security when threat indicators emerge — same case, same timeline.</div></div>
+    </div>
+  </div>
+  <div class="elastic-logo"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M20.345 16.33l-3.959-.926-1.05-2.01 5.177-4.535a3.962 3.962 0 012.559 3.702 4.006 4.006 0 01-2.727 3.77m-2.976 4.68c-.616 0-1.22-.207-1.714-.587l.782-4.077 3.596.841c.115.31.172.642.172.987a2.839 2.839 0 01-2.836 2.836m-2.637-.586a5.92 5.92 0 01-4.908 2.6A5.947 5.947 0 014 15.905l5.167-4.67 5.272 2.403 1.167 2.23zM.928 11.443a4.007 4.007 0 012.726-3.77l3.95.933.927 1.98-5.05 4.565a3.97 3.97 0 01-2.553-3.708m5.703-8.45a2.841 2.841 0 011.723.58l-.789 4.092-3.598-.85a2.842 2.842 0 01-.172-.986A2.84 2.84 0 016.63 2.992m2.66.59A5.92 5.92 0 0120.1 6.93c0 .4-.038.781-.114 1.164l-5.299 4.643-5.251-2.394-1.026-2.19zM24 12.571a4.723 4.723 0 00-3.124-4.454 6.695 6.695 0 00.126-1.29A6.789 6.789 0 0014.22.047 6.769 6.769 0 008.727 2.86a3.586 3.586 0 00-2.204-.754A3.604 3.604 0 003.15 6.959 4.786 4.786 0 000 11.431 4.727 4.727 0 003.139 15.9a6.876 6.876 0 00-.124 1.289 6.773 6.773 0 006.765 6.765c2.19 0 4.22-1.052 5.49-2.824a3.568 3.568 0 002.207.769 3.603 3.603 0 003.374-4.854A4.785 4.785 0 0024 12.572"/></svg></div>
+</div>
+<div class="slide" id="s19">
+  <div class="sec-wrap">
+    <div class="section-label">Part 6</div>
+    <div class="section-title">10 Real-World Use Cases</div>
+    <div class="section-sub">O11y + Security converging on a single platform</div>
+  </div>
+  <div class="elastic-logo"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M20.345 16.33l-3.959-.926-1.05-2.01 5.177-4.535a3.962 3.962 0 012.559 3.702 4.006 4.006 0 01-2.727 3.77m-2.976 4.68c-.616 0-1.22-.207-1.714-.587l.782-4.077 3.596.841c.115.31.172.642.172.987a2.839 2.839 0 01-2.836 2.836m-2.637-.586a5.92 5.92 0 01-4.908 2.6A5.947 5.947 0 014 15.905l5.167-4.67 5.272 2.403 1.167 2.23zM.928 11.443a4.007 4.007 0 012.726-3.77l3.95.933.927 1.98-5.05 4.565a3.97 3.97 0 01-2.553-3.708m5.703-8.45a2.841 2.841 0 011.723.58l-.789 4.092-3.598-.85a2.842 2.842 0 01-.172-.986A2.84 2.84 0 016.63 2.992m2.66.59A5.92 5.92 0 0120.1 6.93c0 .4-.038.781-.114 1.164l-5.299 4.643-5.251-2.394-1.026-2.19zM24 12.571a4.723 4.723 0 00-3.124-4.454 6.695 6.695 0 00.126-1.29A6.789 6.789 0 0014.22.047 6.769 6.769 0 008.727 2.86a3.586 3.586 0 00-2.204-.754A3.604 3.604 0 003.15 6.959 4.786 4.786 0 000 11.431 4.727 4.727 0 003.139 15.9a6.876 6.876 0 00-.124 1.289 6.773 6.773 0 006.765 6.765c2.19 0 4.22-1.052 5.49-2.824a3.568 3.568 0 002.207.769 3.603 3.603 0 003.374-4.854A4.785 4.785 0 0024 12.572"/></svg></div>
+</div>
+<div class="slide" id="s20">
+  <div class="accent-bar"></div>
+  <div class="hdr"><div class="hdg">Use Case Index: 10 Ways O11y + Security Converge</div><div class="sub">Each use case: unique O11y signal + Security confirmation + Knowledge correlation = faster MTTD/MTTR</div></div>
+  <div class="body col">
+    <div class="uc-table">
+      <div class="uc-hdr"><span>#</span><span>Use Case</span><span>O11y Signal</span><span>Security Signal</span><span>MTTD</span><span>MTTR</span></div>
+      <div class="uc-row"><span>1</span><span><a href="#s21" class="uc-link">Cryptomining Attack</a></span><span>Universal Profiling</span><span>SIEM rule + CVE</span><span class="t-blue">2 min</span><span class="t-blue">15 min</span></div>
+      <div class="uc-row"><span>2</span><span><a href="#s22" class="uc-link">Data Exfiltration</a></span><span>APM traces + metrics</span><span>UEBA + threat intel</span><span class="t-blue">4 hrs</span><span class="t-blue">30 min</span></div>
+      <div class="uc-row"><span>3</span><span><a href="#s23" class="uc-link">Supply Chain Compromise</a></span><span>Streams + APM topology</span><span>Threat intel + SIEM</span><span class="t-blue">5 min</span><span class="t-blue">25 min</span></div>
+      <div class="uc-row"><span>4</span><span><a href="#s24" class="uc-link">Ransomware (Pre-Encrypt)</a></span><span>Infra disk I/O metrics</span><span>Endpoint + threat intel</span><span class="t-blue">2 min</span><span class="t-blue">6 min</span></div>
+      <div class="uc-row"><span>5</span><span><a href="#s25" class="uc-link">Insider Threat</a></span><span>APM DB query monitoring</span><span>UEBA + HR context</span><span class="t-blue">9 days</span><span class="t-blue">—</span></div>
+      <div class="uc-row"><span>6</span><span><a href="#s26" class="uc-link">Cloud Misconfiguration</a></span><span>Infra S3 access logs</span><span>CSPM + threat intel</span><span class="t-blue">1 min</span><span class="t-blue">5 min</span></div>
+      <div class="uc-row"><span>7</span><span><a href="#s27" class="uc-link">DDoS Attack</a></span><span>Network telemetry</span><span>ML anomaly + WAF</span><span class="t-blue">30 sec</span><span class="t-blue">2 min</span></div>
+      <div class="uc-row"><span>8</span><span><a href="#s28" class="uc-link">Credential Stuffing</a></span><span>APM auth traces</span><span>Brute force + UEBA</span><span class="t-blue">3 min</span><span class="t-blue">10 min</span></div>
+      <div class="uc-row"><span>9</span><span><a href="#s29" class="uc-link">K8s Container Escape</a></span><span>K8s monitoring</span><span>Falco/CWP runtime</span><span class="t-blue">10 sec</span><span class="t-blue">4 min</span></div>
+      <div class="uc-row"><span>10</span><span><a href="#s30" class="uc-link">Lateral Movement</a></span><span>APM service topology</span><span>Network detection</span><span class="t-blue">8 min</span><span class="t-blue">20 min</span></div>
+    </div>
+  </div>
+  <div class="elastic-logo"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M20.345 16.33l-3.959-.926-1.05-2.01 5.177-4.535a3.962 3.962 0 012.559 3.702 4.006 4.006 0 01-2.727 3.77m-2.976 4.68c-.616 0-1.22-.207-1.714-.587l.782-4.077 3.596.841c.115.31.172.642.172.987a2.839 2.839 0 01-2.836 2.836m-2.637-.586a5.92 5.92 0 01-4.908 2.6A5.947 5.947 0 014 15.905l5.167-4.67 5.272 2.403 1.167 2.23zM.928 11.443a4.007 4.007 0 012.726-3.77l3.95.933.927 1.98-5.05 4.565a3.97 3.97 0 01-2.553-3.708m5.703-8.45a2.841 2.841 0 011.723.58l-.789 4.092-3.598-.85a2.842 2.842 0 01-.172-.986A2.84 2.84 0 016.63 2.992m2.66.59A5.92 5.92 0 0120.1 6.93c0 .4-.038.781-.114 1.164l-5.299 4.643-5.251-2.394-1.026-2.19zM24 12.571a4.723 4.723 0 00-3.124-4.454 6.695 6.695 0 00.126-1.29A6.789 6.789 0 0014.22.047 6.769 6.769 0 008.727 2.86a3.586 3.586 0 00-2.204-.754A3.604 3.604 0 003.15 6.959 4.786 4.786 0 000 11.431 4.727 4.727 0 003.139 15.9a6.876 6.876 0 00-.124 1.289 6.773 6.773 0 006.765 6.765c2.19 0 4.22-1.052 5.49-2.824a3.568 3.568 0 002.207.769 3.603 3.603 0 003.374-4.854A4.785 4.785 0 0024 12.572"/></svg></div>
+</div>
+<div class="slide" id="s21">
+  <div class="accent-bar"></div>
+  <div class="hdr" style="padding:24px 64px 16px"><div class="hdg" style="font-size:32px">Use Case 1: Cryptomining Attack Detection</div><div class="sub" style="font-size:16px">Universal Profiling + Streams + SIEM — CPU spike to containment in 15 minutes</div></div>
+  <div class="body" style="padding:16px 64px 16px;flex-direction:column;gap:12px;overflow-y:auto">
+    <div class="scenario-box">
+      <div class="scenario-label">Scenario</div>
+      <div class="scenario-text">E-commerce checkout service suddenly experiences 99% CPU utilization during peak hours. DevOps notices slow response times, but root cause is unclear.</div>
+    </div>
+    <div class="two-cols" style="flex:0 0 auto;gap:16px">
+      <div class="info-card" style="padding:16px 18px"><div class="ic-title" style="font-size:16px">O11y Signal</div><div class="ic-body" style="font-size:14px">Universal Profiling: container process at 99% CPU on crypto hashes. Metrics: sustained spike on 3 pods for 18 min.</div></div>
+      <div class="info-card" style="padding:16px 18px"><div class="ic-title" style="font-size:16px">Security Action</div><div class="ic-body" style="font-size:14px">ECS data triggers cryptomining detection rule. AI Assistant IDs CVE + MITRE ATT&CK T1496. Workflow auto-isolates pods.</div></div>
+    </div>
+    <div class="timeline-block" style="flex:0 0 auto;padding:12px 16px">
+      <div class="tl-head" style="font-size:14px">Timeline</div>
+      <div class="tl-pre" style="font-size:14px;line-height:1.6"><div><span class="tl-alert">T+0        </span> Universal Profiling: 99% CPU on crypto hash ops across 3 pods</div>
+<div><span class="tl-warning">T+2        </span> Streams: Significant Event — unexpected process spawn via cron</div>
+<div><span class="tl-info">T+7        </span> SIEM rule fires. AI Assistant: CVE + MITRE T1496</div>
+<div><span class="tl-info">T+10       </span> Security team validates. Correlation: external IP from threat intel</div>
+<div><span class="tl-success">T+15       </span> Automated workflow isolates pods, kills processes. CPU back to 12%</div></div>
+    </div>
+    <div style="flex:0 0 auto">
+      <div style="font-size:14px;font-weight:700;color:var(--cyan);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px">Detection Flow & Evidence</div>
+        <div class="detection-block">
+          <div class="det-step">1. O11y Metrics Alert</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>system.process.cpu.total.pct > 0.95 for 5 minutes</code></div>
+          <div class="log-block"><span class="log-msg">process.name: "xmrig" | <span class="log-alert">cpu.pct: 0.99</span> | pod: "checkout-7f8b9"</span></div>
+          <div class="det-usage">→ Triggered investigation into high CPU process</div>
+        </div>
+        <div class="detection-block">
+          <div class="det-step">2. Streams Detection Rule</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>event.type: process_start AND parent.name: crond</code></div>
+          <div class="log-block"><span class="log-msg">event.type: "process_start" | parent: "crond" | child: <span class="log-highlight">"xmrig"</span></span></div>
+          <div class="det-usage">→ Identified unauthorized process spawn pattern</div>
+        </div>
+        <div class="detection-block">
+          <div class="det-step">3. Security Correlation</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>destination.ip: * AND process.name: xmrig</code></div>
+          <div class="log-block"><span class="log-msg">threat.indicator.ip: "185.220.101.x" | matched: <span class="log-alert">cryptomining_pool</span></span></div>
+          <div class="det-usage">→ Confirmed C2 communication to known mining pool</div>
+        </div>
+        <div class="detection-block">
+          <div class="det-step">4. SIEM Enrichment</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>JOIN threat_intel ON destination.ip</code></div>
+          <div class="log-block"><span class="log-msg">ecs.version: "8.14" | event.category: ["process","malware"] | mitre: "T1496"</span></div>
+          <div class="det-usage">→ Auto-triggered isolation workflow via MITRE mapping</div>
+        </div>
+    </div>
+    <div class="result-bar" style="margin-top:auto">✓ Detected via O11y CPU spike → Contained via Security workflow → MTTR: 15 min (vs 4 hrs manual)</div>
+  </div>
+  <div class="elastic-logo"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M20.345 16.33l-3.959-.926-1.05-2.01 5.177-4.535a3.962 3.962 0 012.559 3.702 4.006 4.006 0 01-2.727 3.77m-2.976 4.68c-.616 0-1.22-.207-1.714-.587l.782-4.077 3.596.841c.115.31.172.642.172.987a2.839 2.839 0 01-2.836 2.836m-2.637-.586a5.92 5.92 0 01-4.908 2.6A5.947 5.947 0 014 15.905l5.167-4.67 5.272 2.403 1.167 2.23zM.928 11.443a4.007 4.007 0 012.726-3.77l3.95.933.927 1.98-5.05 4.565a3.97 3.97 0 01-2.553-3.708m5.703-8.45a2.841 2.841 0 011.723.58l-.789 4.092-3.598-.85a2.842 2.842 0 01-.172-.986A2.84 2.84 0 016.63 2.992m2.66.59A5.92 5.92 0 0120.1 6.93c0 .4-.038.781-.114 1.164l-5.299 4.643-5.251-2.394-1.026-2.19zM24 12.571a4.723 4.723 0 00-3.124-4.454 6.695 6.695 0 00.126-1.29A6.789 6.789 0 0014.22.047 6.769 6.769 0 008.727 2.86a3.586 3.586 0 00-2.204-.754A3.604 3.604 0 003.15 6.959 4.786 4.786 0 000 11.431 4.727 4.727 0 003.139 15.9a6.876 6.876 0 00-.124 1.289 6.773 6.773 0 006.765 6.765c2.19 0 4.22-1.052 5.49-2.824a3.568 3.568 0 002.207.769 3.603 3.603 0 003.374-4.854A4.785 4.785 0 0024 12.572"/></svg></div>
+</div>
+<div class="slide" id="s22">
+  <div class="accent-bar"></div>
+  <div class="hdr" style="padding:24px 64px 16px"><div class="hdg" style="font-size:32px">Use Case 2: Data Exfiltration</div><div class="sub" style="font-size:16px">APM traces + metrics — Unusual outbound transfer patterns caught in 4 hours</div></div>
+  <div class="body" style="padding:16px 64px 16px;flex-direction:column;gap:12px;overflow-y:auto">
+    <div class="scenario-box">
+      <div class="scenario-label">Scenario</div>
+      <div class="scenario-text">Customer support agent's session shows unusual database query volume and API calls to external file-sharing service during off-hours.</div>
+    </div>
+    <div class="two-cols" style="flex:0 0 auto;gap:16px">
+      <div class="info-card" style="padding:16px 18px"><div class="ic-title" style="font-size:16px">O11y Signal</div><div class="ic-body" style="font-size:14px">APM traces + metrics: 18 GB outbound transfer to external endpoint in 2 hrs. Spike in database SELECT queries (5,000+ rows/query).</div></div>
+      <div class="info-card" style="padding:16px 18px"><div class="ic-title" style="font-size:16px">Security Action</div><div class="ic-body" style="font-size:14px">UEBA + threat intel: behavioral anomaly for user. Correlation with recent phishing campaign. Session terminated, credentials revoked.</div></div>
+    </div>
+    <div class="timeline-block" style="flex:0 0 auto;padding:12px 16px">
+      <div class="tl-head" style="font-size:14px">Timeline</div>
+      <div class="tl-pre" style="font-size:14px;line-height:1.6"><div><span class="tl-warning">T+0        </span> APM: Unusual spike in DB query volume from user session</div>
+<div><span class="tl-alert">T+45min    </span> Network metrics: 18 GB outbound to external endpoint</div>
+<div><span class="tl-warning">T+2hr      </span> UEBA: User behavior anomaly detected — 3.2σ from baseline</div>
+<div><span class="tl-alert">T+3hr      </span> Threat intel match: file.io domain in recent phishing TTPs</div>
+<div><span class="tl-success">T+4hr      </span> Incident response: Session killed, creds revoked, forensics begun</div></div>
+    </div>
+    <div style="flex:0 0 auto">
+      <div style="font-size:14px;font-weight:700;color:var(--cyan);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px">Detection Flow & Evidence</div>
+        <div class="detection-block">
+          <div class="det-step">1. APM Trace Analysis</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>db.rows_examined > 1000 GROUP BY user.name</code></div>
+          <div class="log-block"><span class="log-msg">span.name: "SELECT * FROM customers" | <span class="log-highlight">rows: 5247</span> | user: "sarah.johnson"</span></div>
+          <div class="det-usage">→ Flagged abnormal query size for investigation</div>
+        </div>
+        <div class="detection-block">
+          <div class="det-step">2. Network Metrics Alert</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>SUM(http.request.bytes) BY user.name WHERE > 10GB</code></div>
+          <div class="log-block"><span class="log-msg"><span class="log-alert">http.request.bytes: 18874200064</span> | url.domain: "file.io" | 2hr window</span></div>
+          <div class="det-usage">→ Confirmed large outbound transfer to external service</div>
+        </div>
+        <div class="detection-block">
+          <div class="det-step">3. UEBA Behavioral Analysis</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>COMPARE user activity vs 30-day baseline</code></div>
+          <div class="log-block"><span class="log-msg">user.name: "sarah.johnson" | <span class="log-alert">anomaly_score: 92</span> | deviation: 3.2σ</span></div>
+          <div class="det-usage">→ Established abnormal behavior pattern for user</div>
+        </div>
+        <div class="detection-block">
+          <div class="det-step">4. Threat Intel Correlation</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>MATCH url.domain IN threat_feed.domains</code></div>
+          <div class="log-block"><span class="log-msg">indicator.type: "domain" | matched: <span class="log-alert">APT29_phishing_campaign_2026</span></span></div>
+          <div class="det-usage">→ Linked to active phishing campaign, escalated to IR team</div>
+        </div>
+    </div>
+    <div class="result-bar" style="margin-top:auto">✓ O11y APM caught volume spike → UEBA linked to user → Threat intel confirmed TTP → MTTR: 30 min</div>
+  </div>
+  <div class="elastic-logo"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M20.345 16.33l-3.959-.926-1.05-2.01 5.177-4.535a3.962 3.962 0 012.559 3.702 4.006 4.006 0 01-2.727 3.77m-2.976 4.68c-.616 0-1.22-.207-1.714-.587l.782-4.077 3.596.841c.115.31.172.642.172.987a2.839 2.839 0 01-2.836 2.836m-2.637-.586a5.92 5.92 0 01-4.908 2.6A5.947 5.947 0 014 15.905l5.167-4.67 5.272 2.403 1.167 2.23zM.928 11.443a4.007 4.007 0 012.726-3.77l3.95.933.927 1.98-5.05 4.565a3.97 3.97 0 01-2.553-3.708m5.703-8.45a2.841 2.841 0 011.723.58l-.789 4.092-3.598-.85a2.842 2.842 0 01-.172-.986A2.84 2.84 0 016.63 2.992m2.66.59A5.92 5.92 0 0120.1 6.93c0 .4-.038.781-.114 1.164l-5.299 4.643-5.251-2.394-1.026-2.19zM24 12.571a4.723 4.723 0 00-3.124-4.454 6.695 6.695 0 00.126-1.29A6.789 6.789 0 0014.22.047 6.769 6.769 0 008.727 2.86a3.586 3.586 0 00-2.204-.754A3.604 3.604 0 003.15 6.959 4.786 4.786 0 000 11.431 4.727 4.727 0 003.139 15.9a6.876 6.876 0 00-.124 1.289 6.773 6.773 0 006.765 6.765c2.19 0 4.22-1.052 5.49-2.824a3.568 3.568 0 002.207.769 3.603 3.603 0 003.374-4.854A4.785 4.785 0 0024 12.572"/></svg></div>
+</div>
+<div class="slide" id="s23">
+  <div class="accent-bar"></div>
+  <div class="hdr" style="padding:24px 64px 16px"><div class="hdg" style="font-size:32px">Use Case 3: Supply Chain Compromise</div><div class="sub" style="font-size:16px">Streams + APM topology — Backdoored npm package detected in 5 minutes</div></div>
+  <div class="body" style="padding:16px 64px 16px;flex-direction:column;gap:12px;overflow-y:auto">
+    <div class="scenario-box">
+      <div class="scenario-label">Scenario</div>
+      <div class="scenario-text">CI/CD pipeline builds production image with compromised npm dependency that beacons to C2 server after deployment.</div>
+    </div>
+    <div class="two-cols" style="flex:0 0 auto;gap:16px">
+      <div class="info-card" style="padding:16px 18px"><div class="ic-title" style="font-size:16px">O11y Signal</div><div class="ic-body" style="font-size:14px">Streams + APM topology: New outbound connection to unknown domain from payment service. APM shows dependency graph change.</div></div>
+      <div class="info-card" style="padding:16px 18px"><div class="ic-title" style="font-size:16px">Security Action</div><div class="ic-body" style="font-size:14px">Threat intel + SIEM: Domain matches recent supply-chain IOC. AI Assistant maps to MITRE T1195.002. Rollback initiated.</div></div>
+    </div>
+    <div class="timeline-block" style="flex:0 0 auto;padding:12px 16px">
+      <div class="tl-head" style="font-size:14px">Timeline</div>
+      <div class="tl-pre" style="font-size:14px;line-height:1.6"><div><span class="tl-alert">T+0        </span> Streams: New network.connection event to unknown domain</div>
+<div><span class="tl-warning">T+2        </span> APM topology: Dependency tree shows new lib 'utils-crypto@2.1.3'</div>
+<div><span class="tl-alert">T+3        </span> SIEM: Domain match in supply-chain compromise feed</div>
+<div><span class="tl-alert">T+4        </span> AI Assistant: CVE-2026-XXXXX, npm package backdoor confirmed</div>
+<div><span class="tl-success">T+5        </span> Automated rollback to previous image, pods restarted</div></div>
+    </div>
+    <div style="flex:0 0 auto">
+      <div style="font-size:14px;font-weight:700;color:var(--cyan);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px">Detection Flow & Evidence</div>
+        <div class="detection-block">
+          <div class="det-step">1. Streams Network Detection</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>network.direction: egress AND destination.ip: NOT (10.0.0.0/8)</code></div>
+          <div class="log-block"><span class="log-msg">network.direction: "egress" | <span class="log-alert">destination.ip: "203.0.113.42"</span> | <span class="log-highlight">NEW</span></span></div>
+          <div class="det-usage">→ Detected first-time external connection from service</div>
+        </div>
+        <div class="detection-block">
+          <div class="det-step">2. APM Dependency Tracking</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>DIFF service.dependencies BETWEEN deploy@T-10m AND deploy@now</code></div>
+          <div class="log-block"><span class="log-msg">service.dependency: <span class="log-highlight">"utils-crypto@2.1.3"</span> | first_seen: "2026-05-06T08:15Z"</span></div>
+          <div class="det-usage">→ Identified new library introduced in latest deployment</div>
+        </div>
+        <div class="detection-block">
+          <div class="det-step">3. Threat Intel Match</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>MATCH destination.ip IN ioc_feed WHERE category: supply_chain</code></div>
+          <div class="log-block"><span class="log-msg">ioc.domain: "c2-node-17.onion" | campaign: <span class="log-alert">"npm_backdoor_q2_2026"</span></span></div>
+          <div class="det-usage">→ Confirmed backdoored package via known C2 infrastructure</div>
+        </div>
+        <div class="detection-block">
+          <div class="det-step">4. SIEM Auto-Response</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>IF mitre.technique: T1195.002 THEN workflow.rollback</code></div>
+          <div class="log-block"><span class="log-msg">event.code: "supply_chain_compromise" | mitre: "T1195.002" | action: <span class="log-success">ROLLBACK</span></span></div>
+          <div class="det-usage">→ Triggered automated rollback to previous safe image</div>
+        </div>
+    </div>
+    <div class="result-bar" style="margin-top:auto">✓ Streams caught new egress → APM showed dep change → Threat intel confirmed → MTTR: 25 min</div>
+  </div>
+  <div class="elastic-logo"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M20.345 16.33l-3.959-.926-1.05-2.01 5.177-4.535a3.962 3.962 0 012.559 3.702 4.006 4.006 0 01-2.727 3.77m-2.976 4.68c-.616 0-1.22-.207-1.714-.587l.782-4.077 3.596.841c.115.31.172.642.172.987a2.839 2.839 0 01-2.836 2.836m-2.637-.586a5.92 5.92 0 01-4.908 2.6A5.947 5.947 0 014 15.905l5.167-4.67 5.272 2.403 1.167 2.23zM.928 11.443a4.007 4.007 0 012.726-3.77l3.95.933.927 1.98-5.05 4.565a3.97 3.97 0 01-2.553-3.708m5.703-8.45a2.841 2.841 0 011.723.58l-.789 4.092-3.598-.85a2.842 2.842 0 01-.172-.986A2.84 2.84 0 016.63 2.992m2.66.59A5.92 5.92 0 0120.1 6.93c0 .4-.038.781-.114 1.164l-5.299 4.643-5.251-2.394-1.026-2.19zM24 12.571a4.723 4.723 0 00-3.124-4.454 6.695 6.695 0 00.126-1.29A6.789 6.789 0 0014.22.047 6.769 6.769 0 008.727 2.86a3.586 3.586 0 00-2.204-.754A3.604 3.604 0 003.15 6.959 4.786 4.786 0 000 11.431 4.727 4.727 0 003.139 15.9a6.876 6.876 0 00-.124 1.289 6.773 6.773 0 006.765 6.765c2.19 0 4.22-1.052 5.49-2.824a3.568 3.568 0 002.207.769 3.603 3.603 0 003.374-4.854A4.785 4.785 0 0024 12.572"/></svg></div>
+</div>
+<div class="slide" id="s24">
+  <div class="accent-bar"></div>
+  <div class="hdr" style="padding:24px 64px 16px"><div class="hdg" style="font-size:32px">Use Case 4: Ransomware (Pre-Encryption)</div><div class="sub" style="font-size:16px">Infrastructure disk I/O metrics — Stopped before encryption started</div></div>
+  <div class="body" style="padding:16px 64px 16px;flex-direction:column;gap:12px;overflow-y:auto">
+    <div class="scenario-box">
+      <div class="scenario-label">Scenario</div>
+      <div class="scenario-text">File server shows sudden spike in disk write operations and file modification rate. No user complaints yet.</div>
+    </div>
+    <div class="two-cols" style="flex:0 0 auto;gap:16px">
+      <div class="info-card" style="padding:16px 18px"><div class="ic-title" style="font-size:16px">O11y Signal</div><div class="ic-body" style="font-size:14px">Infra disk I/O metrics: 12,000 file writes/sec (baseline: 80/sec). File modification pattern: sequential directory traversal.</div></div>
+      <div class="info-card" style="padding:16px 18px"><div class="ic-title" style="font-size:16px">Security Action</div><div class="ic-body" style="font-size:14px">Endpoint + threat intel: Process behavior matches ransomware pre-encryption. AI Assistant IDs binary hash in VirusTotal. Host isolated.</div></div>
+    </div>
+    <div class="timeline-block" style="flex:0 0 auto;padding:12px 16px">
+      <div class="tl-head" style="font-size:14px">Timeline</div>
+      <div class="tl-pre" style="font-size:14px;line-height:1.6"><div><span class="tl-alert">T+0        </span> Metrics: Disk write IOPS spike from 80 → 12,000/sec on file-srv-03</div>
+<div><span class="tl-warning">T+1        </span> Infra monitoring: File modification pattern detected (directory scan)</div>
+<div><span class="tl-alert">T+2        </span> Endpoint EDR: Suspicious process 'svchost32.exe' with obfuscation</div>
+<div><span class="tl-alert">T+3        </span> Threat intel: Binary hash match — REvil ransomware variant</div>
+<div><span class="tl-success">T+6        </span> Host isolated, process killed. 0 files encrypted. Backup verified.</div></div>
+    </div>
+    <div style="flex:0 0 auto">
+      <div style="font-size:14px;font-weight:700;color:var(--cyan);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px">Detection Flow & Evidence</div>
+        <div class="detection-block">
+          <div class="det-step">1. Infrastructure Metrics Alert</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>RATE(system.diskio.write.ops) > 1000/sec</code></div>
+          <div class="log-block"><span class="log-msg"><span class="log-alert">system.diskio.write.ops: 12047</span> | host: "file-srv-03" | <span class="log-highlight">SPIKE</span></span></div>
+          <div class="det-usage">→ Triggered immediate investigation of disk activity</div>
+        </div>
+        <div class="detection-block">
+          <div class="det-step">2. File Activity Pattern</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>PATTERN(file.activity) MATCHES sequential_directory_scan</code></div>
+          <div class="log-block"><span class="log-msg">file.activity: "modify" | pattern: "sequential_traversal" | rate: 98/s</span></div>
+          <div class="det-usage">→ Identified ransomware-like file access behavior</div>
+        </div>
+        <div class="detection-block">
+          <div class="det-step">3. Endpoint Process Analysis</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>process.name: svchost*.exe AND parent.name: powershell</code></div>
+          <div class="log-block"><span class="log-msg">process.name: <span class="log-alert">"svchost32.exe"</span> | parent: "powershell" | SUSPICIOUS</span></div>
+          <div class="det-usage">→ Detected masqueraded malicious process</div>
+        </div>
+        <div class="detection-block">
+          <div class="det-step">4. Threat Intel Hash Lookup</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>ENRICH file.hash.sha256 WITH virustotal_feed</code></div>
+          <div class="log-block"><span class="log-msg">file.hash.sha256: "a4f3e2..." | <span class="log-alert">malware.family: "REvil"</span> | confidence: 0.97</span></div>
+          <div class="det-usage">→ Confirmed ransomware, triggered host isolation workflow</div>
+        </div>
+    </div>
+    <div class="result-bar" style="margin-top:auto">✓ Infra metrics caught I/O anomaly → Endpoint confirmed malware → Isolated pre-encryption → $0 damage</div>
+  </div>
+  <div class="elastic-logo"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M20.345 16.33l-3.959-.926-1.05-2.01 5.177-4.535a3.962 3.962 0 012.559 3.702 4.006 4.006 0 01-2.727 3.77m-2.976 4.68c-.616 0-1.22-.207-1.714-.587l.782-4.077 3.596.841c.115.31.172.642.172.987a2.839 2.839 0 01-2.836 2.836m-2.637-.586a5.92 5.92 0 01-4.908 2.6A5.947 5.947 0 014 15.905l5.167-4.67 5.272 2.403 1.167 2.23zM.928 11.443a4.007 4.007 0 012.726-3.77l3.95.933.927 1.98-5.05 4.565a3.97 3.97 0 01-2.553-3.708m5.703-8.45a2.841 2.841 0 011.723.58l-.789 4.092-3.598-.85a2.842 2.842 0 01-.172-.986A2.84 2.84 0 016.63 2.992m2.66.59A5.92 5.92 0 0120.1 6.93c0 .4-.038.781-.114 1.164l-5.299 4.643-5.251-2.394-1.026-2.19zM24 12.571a4.723 4.723 0 00-3.124-4.454 6.695 6.695 0 00.126-1.29A6.789 6.789 0 0014.22.047 6.769 6.769 0 008.727 2.86a3.586 3.586 0 00-2.204-.754A3.604 3.604 0 003.15 6.959 4.786 4.786 0 000 11.431 4.727 4.727 0 003.139 15.9a6.876 6.876 0 00-.124 1.289 6.773 6.773 0 006.765 6.765c2.19 0 4.22-1.052 5.49-2.824a3.568 3.568 0 002.207.769 3.603 3.603 0 003.374-4.854A4.785 4.785 0 0024 12.572"/></svg></div>
+</div>
+<div class="slide" id="s25">
+  <div class="accent-bar"></div>
+  <div class="hdr" style="padding:24px 64px 16px"><div class="hdg" style="font-size:32px">Use Case 5: Insider Threat</div><div class="sub" style="font-size:16px">APM DB query monitoring — Detected slow-burn data theft over 9 days</div></div>
+  <div class="body" style="padding:16px 64px 16px;flex-direction:column;gap:12px;overflow-y:auto">
+    <div class="scenario-box">
+      <div class="scenario-label">Scenario</div>
+      <div class="scenario-text">Database administrator quietly exports customer PII in small batches over 9 days to avoid detection thresholds.</div>
+    </div>
+    <div class="two-cols" style="flex:0 0 auto;gap:16px">
+      <div class="info-card" style="padding:16px 18px"><div class="ic-title" style="font-size:16px">O11y Signal</div><div class="ic-body" style="font-size:14px">APM DB query monitoring: Consistent pattern of SELECT queries on PII tables during lunch breaks. Low volume per query, high frequency.</div></div>
+      <div class="info-card" style="padding:16px 18px"><div class="ic-title" style="font-size:16px">Security Action</div><div class="ic-body" style="font-size:14px">UEBA + HR context: User access anomaly cross-referenced with recent performance review. Investigation triggered, access revoked.</div></div>
+    </div>
+    <div class="timeline-block" style="flex:0 0 auto;padding:12px 16px">
+      <div class="tl-head" style="font-size:14px">Timeline</div>
+      <div class="tl-pre" style="font-size:14px;line-height:1.6"><div><span class="tl-warning">Day 1-8    </span> APM: Daily 12:15-12:45 window — 50 SELECT queries on customer.pii table</div>
+<div><span class="tl-alert">Day 9      </span> UEBA: Accumulated anomaly score crosses threshold (slow-burn pattern)</div>
+<div><span class="tl-info">Day 9+2hr  </span> HR context enrichment: User under performance improvement plan</div>
+<div><span class="tl-alert">Day 9+4hr  </span> Security investigation: USB device logs show data copy to external drive</div>
+<div><span class="tl-success">Day 9+6hr  </span> Access revoked, forensics begun. 12,500 customer records accessed.</div></div>
+    </div>
+    <div style="flex:0 0 auto">
+      <div style="font-size:14px;font-weight:700;color:var(--cyan);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px">Detection Flow & Evidence</div>
+        <div class="detection-block">
+          <div class="det-step">1. APM Database Trace Pattern</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>COUNT(span.db.statement) WHERE table: customer.pii GROUP BY user, HOUR</code></div>
+          <div class="log-block"><span class="log-msg">span.db.statement: "SELECT * FROM customers WHERE..." | user: "dba_mike"</span></div>
+          <div class="det-usage">→ Detected repetitive PII query pattern (not a one-time event)</div>
+        </div>
+        <div class="detection-block">
+          <div class="det-step">2. Temporal Analysis</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>DETECT PATTERN WHERE time: 12:00-13:00 FOR 5+ days</code></div>
+          <div class="log-block"><span class="log-msg">db.rows_examined: 47 | timestamp: "12:22:15" | pattern: <span class="log-highlight">DAILY</span></span></div>
+          <div class="det-usage">→ Established consistent lunch-hour access pattern</div>
+        </div>
+        <div class="detection-block">
+          <div class="det-step">3. UEBA Slow-Burn Detection</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>ACCUMULATE user.risk_score OVER 30 days WHERE query: pii</code></div>
+          <div class="log-block"><span class="log-msg">user.risk_score: <span class="log-alert">78</span> | behavior: "slow_burn_exfiltration" | days: 9</span></div>
+          <div class="det-usage">→ Crossed threshold after cumulative scoring flagged pattern</div>
+        </div>
+        <div class="detection-block">
+          <div class="det-step">4. Context Enrichment</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>ENRICH user.name WITH hr_context, device_logs</code></div>
+          <div class="log-block"><span class="log-msg">user.status: "PIP" | device.usb: <span class="log-alert">EXTERNAL_COPY</span> | review_date: "2026-04-15"</span></div>
+          <div class="det-usage">→ HR+device context escalated to security investigation</div>
+        </div>
+    </div>
+    <div class="result-bar" style="margin-top:auto">✓ APM caught repetitive query pattern → UEBA detected slow-burn → HR context raised flag → Investigation</div>
+  </div>
+  <div class="elastic-logo"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M20.345 16.33l-3.959-.926-1.05-2.01 5.177-4.535a3.962 3.962 0 012.559 3.702 4.006 4.006 0 01-2.727 3.77m-2.976 4.68c-.616 0-1.22-.207-1.714-.587l.782-4.077 3.596.841c.115.31.172.642.172.987a2.839 2.839 0 01-2.836 2.836m-2.637-.586a5.92 5.92 0 01-4.908 2.6A5.947 5.947 0 014 15.905l5.167-4.67 5.272 2.403 1.167 2.23zM.928 11.443a4.007 4.007 0 012.726-3.77l3.95.933.927 1.98-5.05 4.565a3.97 3.97 0 01-2.553-3.708m5.703-8.45a2.841 2.841 0 011.723.58l-.789 4.092-3.598-.85a2.842 2.842 0 01-.172-.986A2.84 2.84 0 016.63 2.992m2.66.59A5.92 5.92 0 0120.1 6.93c0 .4-.038.781-.114 1.164l-5.299 4.643-5.251-2.394-1.026-2.19zM24 12.571a4.723 4.723 0 00-3.124-4.454 6.695 6.695 0 00.126-1.29A6.789 6.789 0 0014.22.047 6.769 6.769 0 008.727 2.86a3.586 3.586 0 00-2.204-.754A3.604 3.604 0 003.15 6.959 4.786 4.786 0 000 11.431 4.727 4.727 0 003.139 15.9a6.876 6.876 0 00-.124 1.289 6.773 6.773 0 006.765 6.765c2.19 0 4.22-1.052 5.49-2.824a3.568 3.568 0 002.207.769 3.603 3.603 0 003.374-4.854A4.785 4.785 0 0024 12.572"/></svg></div>
+</div>
+<div class="slide" id="s26">
+  <div class="accent-bar"></div>
+  <div class="hdr" style="padding:24px 64px 16px"><div class="hdg" style="font-size:32px">Use Case 6: Cloud Misconfiguration</div><div class="sub" style="font-size:16px">Infrastructure S3 access logs — Public bucket caught in 1 minute</div></div>
+  <div class="body" style="padding:16px 64px 16px;flex-direction:column;gap:12px;overflow-y:auto">
+    <div class="scenario-box">
+      <div class="scenario-label">Scenario</div>
+      <div class="scenario-text">DevOps engineer accidentally sets S3 bucket to public while testing new deployment pipeline. Bucket contains staging database backups.</div>
+    </div>
+    <div class="two-cols" style="flex:0 0 auto;gap:16px">
+      <div class="info-card" style="padding:16px 18px"><div class="ic-title" style="font-size:16px">O11y Signal</div><div class="ic-body" style="font-size:14px">Infra S3 access logs: Public GET requests from unknown IPs to s3://prod-backups-staging/. Baseline: 0 public requests.</div></div>
+      <div class="info-card" style="padding:16px 18px"><div class="ic-title" style="font-size:16px">Security Action</div><div class="ic-body" style="font-size:14px">CSPM + threat intel: Bucket ACL policy violation detected. IPs match known data scraper networks. Bucket re-secured, logs analyzed.</div></div>
+    </div>
+    <div class="timeline-block" style="flex:0 0 auto;padding:12px 16px">
+      <div class="tl-head" style="font-size:14px">Timeline</div>
+      <div class="tl-pre" style="font-size:14px;line-height:1.6"><div><span class="tl-alert">T+0        </span> S3 access logs: First public GET request from 104.28.x.x</div>
+<div><span class="tl-alert">T+30sec    </span> CSPM: Policy violation — s3://prod-backups-staging ACL set to public-read</div>
+<div><span class="tl-warning">T+45sec    </span> Threat intel: Source IP in web scraper / bot network dataset</div>
+<div><span class="tl-success">T+1min     </span> Automated remediation: Bucket ACL set to private, access reviewed</div>
+<div><span class="tl-info">T+5min     </span> Analysis: 3 objects accessed (non-sensitive test data). No breach.</div></div>
+    </div>
+    <div style="flex:0 0 auto">
+      <div style="font-size:14px;font-weight:700;color:var(--cyan);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px">Detection Flow & Evidence</div>
+        <div class="detection-block">
+          <div class="det-step">1. S3 Access Log Monitoring</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>s3.requester: Anonymous AND s3.bucket: prod-*</code></div>
+          <div class="log-block"><span class="log-msg">http.request.method: "GET" | requester: <span class="log-alert">"Anonymous"</span> | bucket: "prod-backups-staging"</span></div>
+          <div class="det-usage">→ Real-time detection of first unauthorized public access</div>
+        </div>
+        <div class="detection-block">
+          <div class="det-step">2. CSPM Policy Check</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>CHECK s3.acl AGAINST policy WHERE bucket MATCHES prod-*</code></div>
+          <div class="log-block"><span class="log-msg">s3.acl: <span class="log-alert">"public-read"</span> | expected: "private" | VIOLATION | severity: critical</span></div>
+          <div class="det-usage">→ Identified policy drift from security baseline</div>
+        </div>
+        <div class="detection-block">
+          <div class="det-step">3. Threat Intel IP Reputation</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>ENRICH source.ip WITH threat_feed.ip_reputation</code></div>
+          <div class="log-block"><span class="log-msg">source.ip: "104.28.14.x" | category: "web_scraper" | risk: medium</span></div>
+          <div class="det-usage">→ Classified requester as automated bot (not targeted attack)</div>
+        </div>
+        <div class="detection-block">
+          <div class="det-step">4. Auto-Remediation</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>IF s3.acl: public-read THEN SET s3.acl: private</code></div>
+          <div class="log-block"><span class="log-msg">action: "set_acl" | bucket: "prod-backups-staging" | acl: <span class="log-success">"private"</span> | time: 15s</span></div>
+          <div class="det-usage">→ Closed exposure window within seconds, triggered audit</div>
+        </div>
+    </div>
+    <div class="result-bar" style="margin-top:auto">✓ S3 logs showed public access → CSPM flagged policy violation → Auto-remediated → MTTR: 5 min</div>
+  </div>
+  <div class="elastic-logo"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M20.345 16.33l-3.959-.926-1.05-2.01 5.177-4.535a3.962 3.962 0 012.559 3.702 4.006 4.006 0 01-2.727 3.77m-2.976 4.68c-.616 0-1.22-.207-1.714-.587l.782-4.077 3.596.841c.115.31.172.642.172.987a2.839 2.839 0 01-2.836 2.836m-2.637-.586a5.92 5.92 0 01-4.908 2.6A5.947 5.947 0 014 15.905l5.167-4.67 5.272 2.403 1.167 2.23zM.928 11.443a4.007 4.007 0 012.726-3.77l3.95.933.927 1.98-5.05 4.565a3.97 3.97 0 01-2.553-3.708m5.703-8.45a2.841 2.841 0 011.723.58l-.789 4.092-3.598-.85a2.842 2.842 0 01-.172-.986A2.84 2.84 0 016.63 2.992m2.66.59A5.92 5.92 0 0120.1 6.93c0 .4-.038.781-.114 1.164l-5.299 4.643-5.251-2.394-1.026-2.19zM24 12.571a4.723 4.723 0 00-3.124-4.454 6.695 6.695 0 00.126-1.29A6.789 6.789 0 0014.22.047 6.769 6.769 0 008.727 2.86a3.586 3.586 0 00-2.204-.754A3.604 3.604 0 003.15 6.959 4.786 4.786 0 000 11.431 4.727 4.727 0 003.139 15.9a6.876 6.876 0 00-.124 1.289 6.773 6.773 0 006.765 6.765c2.19 0 4.22-1.052 5.49-2.824a3.568 3.568 0 002.207.769 3.603 3.603 0 003.374-4.854A4.785 4.785 0 0024 12.572"/></svg></div>
+</div>
+<div class="slide" id="s27">
+  <div class="accent-bar"></div>
+  <div class="hdr" style="padding:24px 64px 16px"><div class="hdg" style="font-size:32px">Use Case 7: DDoS Attack</div><div class="sub" style="font-size:16px">Network telemetry — Layer 7 flood detected and mitigated in 30 seconds</div></div>
+  <div class="body" style="padding:16px 64px 16px;flex-direction:column;gap:12px;overflow-y:auto">
+    <div class="scenario-box">
+      <div class="scenario-label">Scenario</div>
+      <div class="scenario-text">API gateway experiences sudden 50x traffic spike from distributed sources. Legitimate users report timeouts.</div>
+    </div>
+    <div class="two-cols" style="flex:0 0 auto;gap:16px">
+      <div class="info-card" style="padding:16px 18px"><div class="ic-title" style="font-size:16px">O11y Signal</div><div class="ic-body" style="font-size:14px">Network telemetry: HTTP request rate 240,000 req/min (baseline: 4,800). 95% from <100 source IPs. Pattern: rapid GET on /api/search.</div></div>
+      <div class="info-card" style="padding:16px 18px"><div class="ic-title" style="font-size:16px">Security Action</div><div class="ic-body" style="font-size:14px">ML anomaly + WAF: Traffic pattern identified as L7 DDoS. Rate limiting applied, malicious IPs blocked via automated playbook.</div></div>
+    </div>
+    <div class="timeline-block" style="flex:0 0 auto;padding:12px 16px">
+      <div class="tl-head" style="font-size:14px">Timeline</div>
+      <div class="tl-pre" style="font-size:14px;line-height:1.6"><div><span class="tl-alert">T+0        </span> Network metrics: Request rate spike 4.8k → 240k req/min</div>
+<div><span class="tl-alert">T+10sec    </span> ML anomaly detection: Sustained spike, low source diversity</div>
+<div><span class="tl-warning">T+20sec    </span> WAF analysis: 95% traffic to /api/search endpoint, no auth tokens</div>
+<div><span class="tl-success">T+30sec    </span> Automated response: Rate limit 100 req/min/IP, block top 50 IPs</div>
+<div><span class="tl-success">T+2min     </span> Traffic normalized. Legitimate users restored. Attack mitigated.</div></div>
+    </div>
+    <div style="flex:0 0 auto">
+      <div style="font-size:14px;font-weight:700;color:var(--cyan);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px">Detection Flow & Evidence</div>
+        <div class="detection-block">
+          <div class="det-step">1. Network Rate Spike</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>RATE(http.request.count) OVER 1m > 100x baseline</code></div>
+          <div class="log-block"><span class="log-msg"><span class="log-alert">http.request.count: 240183</span> | window: 1m | source_ips: 87 | ANOMALY</span></div>
+          <div class="det-usage">→ Immediate alert on traffic volume spike</div>
+        </div>
+        <div class="detection-block">
+          <div class="det-step">2. ML Anomaly Scoring</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>PREDICT anomaly_score USING traffic_baseline_model</code></div>
+          <div class="log-block"><span class="log-msg">anomaly.type: "traffic_spike" | score: 0.98 | <span class="log-highlight">deviation: 49.2x baseline</span></span></div>
+          <div class="det-usage">→ ML confirmed not legitimate traffic pattern</div>
+        </div>
+        <div class="detection-block">
+          <div class="det-step">3. WAF Traffic Analysis</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>GROUP http.request BY url.path, http.headers.authorization</code></div>
+          <div class="log-block"><span class="log-msg">url.path: "/api/search" | http.method: "GET" | no_auth: 95% | pattern: flood</span></div>
+          <div class="det-usage">→ Identified targeted endpoint and lack of valid auth</div>
+        </div>
+        <div class="detection-block">
+          <div class="det-step">4. Automated Mitigation</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>APPLY rate_limit WHERE anomaly.score > 0.9</code></div>
+          <div class="log-block"><span class="log-msg">action: "rate_limit" | policy: "100_rpm_per_ip" | <span class="log-success">blocked_ips: 50</span></span></div>
+          <div class="det-usage">→ Applied rate limits and IP blocks within 30 seconds</div>
+        </div>
+    </div>
+    <div class="result-bar" style="margin-top:auto">✓ Network metrics caught spike → ML confirmed anomaly → WAF mitigated → MTTR: 2 min</div>
+  </div>
+  <div class="elastic-logo"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M20.345 16.33l-3.959-.926-1.05-2.01 5.177-4.535a3.962 3.962 0 012.559 3.702 4.006 4.006 0 01-2.727 3.77m-2.976 4.68c-.616 0-1.22-.207-1.714-.587l.782-4.077 3.596.841c.115.31.172.642.172.987a2.839 2.839 0 01-2.836 2.836m-2.637-.586a5.92 5.92 0 01-4.908 2.6A5.947 5.947 0 014 15.905l5.167-4.67 5.272 2.403 1.167 2.23zM.928 11.443a4.007 4.007 0 012.726-3.77l3.95.933.927 1.98-5.05 4.565a3.97 3.97 0 01-2.553-3.708m5.703-8.45a2.841 2.841 0 011.723.58l-.789 4.092-3.598-.85a2.842 2.842 0 01-.172-.986A2.84 2.84 0 016.63 2.992m2.66.59A5.92 5.92 0 0120.1 6.93c0 .4-.038.781-.114 1.164l-5.299 4.643-5.251-2.394-1.026-2.19zM24 12.571a4.723 4.723 0 00-3.124-4.454 6.695 6.695 0 00.126-1.29A6.789 6.789 0 0014.22.047 6.769 6.769 0 008.727 2.86a3.586 3.586 0 00-2.204-.754A3.604 3.604 0 003.15 6.959 4.786 4.786 0 000 11.431 4.727 4.727 0 003.139 15.9a6.876 6.876 0 00-.124 1.289 6.773 6.773 0 006.765 6.765c2.19 0 4.22-1.052 5.49-2.824a3.568 3.568 0 002.207.769 3.603 3.603 0 003.374-4.854A4.785 4.785 0 0024 12.572"/></svg></div>
+</div>
+<div class="slide" id="s28">
+  <div class="accent-bar"></div>
+  <div class="hdr" style="padding:24px 64px 16px"><div class="hdg" style="font-size:32px">Use Case 8: Credential Stuffing</div><div class="sub" style="font-size:16px">APM auth traces — 15,000 login attempts from 200 IPs blocked</div></div>
+  <div class="body" style="padding:16px 64px 16px;flex-direction:column;gap:12px;overflow-y:auto">
+    <div class="scenario-box">
+      <div class="scenario-label">Scenario</div>
+      <div class="scenario-text">Authentication service logs show steady stream of failed login attempts using known-breached credentials from external leak.</div>
+    </div>
+    <div class="two-cols" style="flex:0 0 auto;gap:16px">
+      <div class="info-card" style="padding:16px 18px"><div class="ic-title" style="font-size:16px">O11y Signal</div><div class="ic-body" style="font-size:14px">APM auth traces: 15,000 login attempts in 10 min. Success rate: 0.3% (45 accounts). Source: 200+ IPs, rotating User-Agents.</div></div>
+      <div class="info-card" style="padding:16px 18px"><div class="ic-title" style="font-size:16px">Security Action</div><div class="ic-body" style="font-size:14px">Brute force + UEBA: Credential stuffing pattern detected. AI Assistant cross-checks against HaveIBeenPwned. 45 accounts force-reset.</div></div>
+    </div>
+    <div class="timeline-block" style="flex:0 0 auto;padding:12px 16px">
+      <div class="tl-head" style="font-size:14px">Timeline</div>
+      <div class="tl-pre" style="font-size:14px;line-height:1.6"><div><span class="tl-warning">T+0        </span> APM: Login attempt rate 25/sec (baseline: 2/sec)</div>
+<div><span class="tl-alert">T+3min     </span> Auth service: 97% failure rate, rotating IPs + User-Agents</div>
+<div><span class="tl-alert">T+5min     </span> UEBA: 45 successful logins flagged — password reuse pattern</div>
+<div><span class="tl-alert">T+8min     </span> AI Assistant: Passwords match LinkedIn breach dataset (2021)</div>
+<div><span class="tl-success">T+10min    </span> Force password reset for 45 accounts. IP block applied. MFA enforced.</div></div>
+    </div>
+    <div style="flex:0 0 auto">
+      <div style="font-size:14px;font-weight:700;color:var(--cyan);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px">Detection Flow & Evidence</div>
+        <div class="detection-block">
+          <div class="det-step">1. APM Auth Rate Monitoring</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>RATE(trace WHERE trace.name: */auth/login) > 20/sec</code></div>
+          <div class="log-block"><span class="log-msg">trace.name: "POST /auth/login" | result: "failed" | <span class="log-highlight">rate: 1500/min</span></span></div>
+          <div class="det-usage">→ Detected sustained high-rate login attempts</div>
+        </div>
+        <div class="detection-block">
+          <div class="det-step">2. Success Pattern Analysis</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>WHERE auth.result: success AND password_age > 365d</code></div>
+          <div class="log-block"><span class="log-msg">user.name: "john.doe" | auth.result: <span class="log-alert">"success"</span> | password_age: 1825d</span></div>
+          <div class="det-usage">→ Identified compromised accounts via old password reuse</div>
+        </div>
+        <div class="detection-block">
+          <div class="det-step">3. UEBA Credential Stuffing Detection</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>DETECT pattern: high_failure_rate + IP_rotation + old_passwords</code></div>
+          <div class="log-block"><span class="log-msg">pattern: <span class="log-alert">"credential_stuffing"</span> | accounts_compromised: 45 | source_ips: 203</span></div>
+          <div class="det-usage">→ Confirmed attack pattern vs legitimate failed logins</div>
+        </div>
+        <div class="detection-block">
+          <div class="det-step">4. Breach Database Correlation</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>ENRICH user.password_hash WITH haveibeenpwned_api</code></div>
+          <div class="log-block"><span class="log-msg">breach.source: "LinkedIn_2021" | matched_passwords: 45 | confidence: high</span></div>
+          <div class="det-usage">→ Identified breach source, triggered force password reset</div>
+        </div>
+    </div>
+    <div class="result-bar" style="margin-top:auto">✓ APM caught auth spike → UEBA detected stuffing pattern → Force reset → 45 accounts secured</div>
+  </div>
+  <div class="elastic-logo"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M20.345 16.33l-3.959-.926-1.05-2.01 5.177-4.535a3.962 3.962 0 012.559 3.702 4.006 4.006 0 01-2.727 3.77m-2.976 4.68c-.616 0-1.22-.207-1.714-.587l.782-4.077 3.596.841c.115.31.172.642.172.987a2.839 2.839 0 01-2.836 2.836m-2.637-.586a5.92 5.92 0 01-4.908 2.6A5.947 5.947 0 014 15.905l5.167-4.67 5.272 2.403 1.167 2.23zM.928 11.443a4.007 4.007 0 012.726-3.77l3.95.933.927 1.98-5.05 4.565a3.97 3.97 0 01-2.553-3.708m5.703-8.45a2.841 2.841 0 011.723.58l-.789 4.092-3.598-.85a2.842 2.842 0 01-.172-.986A2.84 2.84 0 016.63 2.992m2.66.59A5.92 5.92 0 0120.1 6.93c0 .4-.038.781-.114 1.164l-5.299 4.643-5.251-2.394-1.026-2.19zM24 12.571a4.723 4.723 0 00-3.124-4.454 6.695 6.695 0 00.126-1.29A6.789 6.789 0 0014.22.047 6.769 6.769 0 008.727 2.86a3.586 3.586 0 00-2.204-.754A3.604 3.604 0 003.15 6.959 4.786 4.786 0 000 11.431 4.727 4.727 0 003.139 15.9a6.876 6.876 0 00-.124 1.289 6.773 6.773 0 006.765 6.765c2.19 0 4.22-1.052 5.49-2.824a3.568 3.568 0 002.207.769 3.603 3.603 0 003.374-4.854A4.785 4.785 0 0024 12.572"/></svg></div>
+</div>
+<div class="slide" id="s29">
+  <div class="accent-bar"></div>
+  <div class="hdr" style="padding:24px 64px 16px"><div class="hdg" style="font-size:32px">Use Case 9: K8s Container Escape</div><div class="sub" style="font-size:16px">Kubernetes monitoring — Escape attempt caught in 10 seconds</div></div>
+  <div class="body" style="padding:16px 64px 16px;flex-direction:column;gap:12px;overflow-y:auto">
+    <div class="scenario-box">
+      <div class="scenario-label">Scenario</div>
+      <div class="scenario-text">Attacker exploits container vulnerability to attempt privilege escalation and breakout to host system.</div>
+    </div>
+    <div class="two-cols" style="flex:0 0 auto;gap:16px">
+      <div class="info-card" style="padding:16px 18px"><div class="ic-title" style="font-size:16px">O11y Signal</div><div class="ic-body" style="font-size:14px">K8s monitoring: Container process spawned shell with CAP_SYS_ADMIN. Syscalls: mount, unshare detected. Pod: payments-api-6d.</div></div>
+      <div class="info-card" style="padding:16px 18px"><div class="ic-title" style="font-size:16px">Security Action</div><div class="ic-body" style="font-size:14px">Falco/CWP runtime: Container escape attempt via CVE-2024-XXXXX. Pod terminated, node quarantined, forensics snapshot taken.</div></div>
+    </div>
+    <div class="timeline-block" style="flex:0 0 auto;padding:12px 16px">
+      <div class="tl-head" style="font-size:14px">Timeline</div>
+      <div class="tl-pre" style="font-size:14px;line-height:1.6"><div><span class="tl-warning">T+0        </span> K8s: Unexpected process spawn in container: /bin/sh</div>
+<div><span class="tl-alert">T+5sec     </span> Falco: CAP_SYS_ADMIN capability + mount syscall detected</div>
+<div><span class="tl-alert">T+8sec     </span> CWP: Container escape ruleset triggered — CVE-2024-XXXXX</div>
+<div><span class="tl-success">T+10sec    </span> Automated response: Pod killed, node cordoned, forensic image captured</div>
+<div><span class="tl-success">T+2min     </span> Analysis: Exploit blocked before host access. No lateral movement.</div></div>
+    </div>
+    <div style="flex:0 0 auto">
+      <div style="font-size:14px;font-weight:700;color:var(--cyan);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px">Detection Flow & Evidence</div>
+        <div class="detection-block">
+          <div class="det-step">1. K8s Process Monitoring</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>process.name: (/bin/sh OR /bin/bash) AND parent.name: java</code></div>
+          <div class="log-block"><span class="log-msg">process.name: "/bin/sh" | parent: "java" | container: "payments-api" | <span class="log-highlight">UNEXPECTED</span></span></div>
+          <div class="det-usage">→ Flagged unusual shell spawn from application process</div>
+        </div>
+        <div class="detection-block">
+          <div class="det-step">2. Falco Runtime Detection</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>DETECT syscall: (mount OR unshare) WITH capability: CAP_SYS_ADMIN</code></div>
+          <div class="log-block"><span class="log-msg">evt.type: "execve" | proc.capabilities: <span class="log-alert">"CAP_SYS_ADMIN"</span> | syscall: "mount"</span></div>
+          <div class="det-usage">→ Identified privilege escalation attempt via syscalls</div>
+        </div>
+        <div class="detection-block">
+          <div class="det-step">3. CWP Rule Correlation</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>MATCH syscall_pattern AGAINST container_escape_signatures</code></div>
+          <div class="log-block"><span class="log-msg">rule: "container_escape_detected" | <span class="log-alert">cve: "CVE-2024-21626"</span> | severity: critical</span></div>
+          <div class="det-usage">→ Mapped to known CVE, triggered kill+quarantine</div>
+        </div>
+        <div class="detection-block">
+          <div class="det-step">4. Automated Response</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>IF rule: container_escape THEN kill_pod AND cordon_node</code></div>
+          <div class="log-block"><span class="log-msg">action: "kill_pod,cordon_node,snapshot" | time: 10s | <span class="log-success">forensics: enabled</span></span></div>
+          <div class="det-usage">→ Prevented escape, preserved evidence for analysis</div>
+        </div>
+    </div>
+    <div class="result-bar" style="margin-top:auto">✓ K8s monitoring caught process spawn → Falco detected escape attempt → Auto-remediated → 0 damage</div>
+  </div>
+  <div class="elastic-logo"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M20.345 16.33l-3.959-.926-1.05-2.01 5.177-4.535a3.962 3.962 0 012.559 3.702 4.006 4.006 0 01-2.727 3.77m-2.976 4.68c-.616 0-1.22-.207-1.714-.587l.782-4.077 3.596.841c.115.31.172.642.172.987a2.839 2.839 0 01-2.836 2.836m-2.637-.586a5.92 5.92 0 01-4.908 2.6A5.947 5.947 0 014 15.905l5.167-4.67 5.272 2.403 1.167 2.23zM.928 11.443a4.007 4.007 0 012.726-3.77l3.95.933.927 1.98-5.05 4.565a3.97 3.97 0 01-2.553-3.708m5.703-8.45a2.841 2.841 0 011.723.58l-.789 4.092-3.598-.85a2.842 2.842 0 01-.172-.986A2.84 2.84 0 016.63 2.992m2.66.59A5.92 5.92 0 0120.1 6.93c0 .4-.038.781-.114 1.164l-5.299 4.643-5.251-2.394-1.026-2.19zM24 12.571a4.723 4.723 0 00-3.124-4.454 6.695 6.695 0 00.126-1.29A6.789 6.789 0 0014.22.047 6.769 6.769 0 008.727 2.86a3.586 3.586 0 00-2.204-.754A3.604 3.604 0 003.15 6.959 4.786 4.786 0 000 11.431 4.727 4.727 0 003.139 15.9a6.876 6.876 0 00-.124 1.289 6.773 6.773 0 006.765 6.765c2.19 0 4.22-1.052 5.49-2.824a3.568 3.568 0 002.207.769 3.603 3.603 0 003.374-4.854A4.785 4.785 0 0024 12.572"/></svg></div>
+</div>
+<div class="slide" id="s30">
+  <div class="accent-bar"></div>
+  <div class="hdr" style="padding:24px 64px 16px"><div class="hdg" style="font-size:32px">Use Case 10: Lateral Movement</div><div class="sub" style="font-size:16px">APM service topology — East-west traffic anomaly detected in 8 minutes</div></div>
+  <div class="body" style="padding:16px 64px 16px;flex-direction:column;gap:12px;overflow-y:auto">
+    <div class="scenario-box">
+      <div class="scenario-label">Scenario</div>
+      <div class="scenario-text">Compromised web server begins scanning internal network and establishing SSH connections to database servers.</div>
+    </div>
+    <div class="two-cols" style="flex:0 0 auto;gap:16px">
+      <div class="info-card" style="padding:16px 18px"><div class="ic-title" style="font-size:16px">O11y Signal</div><div class="ic-body" style="font-size:14px">APM service topology: New connection pattern web-frontend → db-primary (port 22). Baseline: only port 5432. Network flow anomaly.</div></div>
+      <div class="info-card" style="padding:16px 18px"><div class="ic-title" style="font-size:16px">Security Action</div><div class="ic-body" style="font-size:14px">Network detection: East-west traffic to SSH on DB tier. AI Assistant maps to MITRE T1021. Segment isolated, forensics begun.</div></div>
+    </div>
+    <div class="timeline-block" style="flex:0 0 auto;padding:12px 16px">
+      <div class="tl-head" style="font-size:14px">Timeline</div>
+      <div class="tl-pre" style="font-size:14px;line-height:1.6"><div><span class="tl-warning">T+0        </span> APM topology: New service dependency web-frontend → db-primary:22</div>
+<div><span class="tl-alert">T+3min     </span> Network flow: SSH connections to 5 internal DB hosts from web tier</div>
+<div><span class="tl-alert">T+5min     </span> Network detection: Port scan activity detected (ports 22,3389,5985)</div>
+<div><span class="tl-success">T+8min     </span> AI Assistant: MITRE T1021 (Remote Services). Segment isolated.</div>
+<div><span class="tl-info">T+20min    </span> Forensics: Initial access via unpatched web app (CVE-2026-XXXXX)</div></div>
+    </div>
+    <div style="flex:0 0 auto">
+      <div style="font-size:14px;font-weight:700;color:var(--cyan);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px">Detection Flow & Evidence</div>
+        <div class="detection-block">
+          <div class="det-step">1. APM Topology Change Detection</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>DIFF service.dependencies BETWEEN now AND T-1hour</code></div>
+          <div class="log-block"><span class="log-msg">service.name: "web-frontend" | dependency.new: <span class="log-highlight">"db-primary:22"</span> | ANOMALY</span></div>
+          <div class="det-usage">→ Detected first-time SSH connection from web tier</div>
+        </div>
+        <div class="detection-block">
+          <div class="det-step">2. Network Flow Analysis</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>WHERE flow.src: 10.0.1.x AND flow.dst: 10.0.2.x AND port: 22</code></div>
+          <div class="log-block"><span class="log-msg">flow.src: "10.0.1.15" | flow.dst: "10.0.2.x" | port: 22 | <span class="log-alert">count: 5</span></span></div>
+          <div class="det-usage">→ Identified multiple east-west SSH attempts (lateral movement)</div>
+        </div>
+        <div class="detection-block">
+          <div class="det-step">3. Port Scan Detection</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>DETECT pattern: connection_attempts TO multiple_ports WITHIN 60s</code></div>
+          <div class="log-block"><span class="log-msg">event.type: "port_scan" | <span class="log-highlight">ports: [22,3389,5985,1433]</span> | source: "10.0.1.15"</span></div>
+          <div class="det-usage">→ Confirmed reconnaissance activity pattern</div>
+        </div>
+        <div class="detection-block">
+          <div class="det-step">4. MITRE ATT&CK Mapping</div>
+          <div class="det-query"><span class="query-label">Detection Query:</span> <code>MAP behavior TO mitre_framework WHERE tactic: lateral_movement</code></div>
+          <div class="log-block"><span class="log-msg"><span class="log-alert">mitre.technique: "T1021"</span> | tactic: "Lateral Movement" | confidence: 0.94</span></div>
+          <div class="det-usage">→ Triggered network segmentation and forensic investigation</div>
+        </div>
+    </div>
+    <div class="result-bar" style="margin-top:auto">✓ APM showed new dependency → Network detected east-west SSH → Isolated segment → MTTR: 20 min</div>
+  </div>
+  <div class="elastic-logo"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M20.345 16.33l-3.959-.926-1.05-2.01 5.177-4.535a3.962 3.962 0 012.559 3.702 4.006 4.006 0 01-2.727 3.77m-2.976 4.68c-.616 0-1.22-.207-1.714-.587l.782-4.077 3.596.841c.115.31.172.642.172.987a2.839 2.839 0 01-2.836 2.836m-2.637-.586a5.92 5.92 0 01-4.908 2.6A5.947 5.947 0 014 15.905l5.167-4.67 5.272 2.403 1.167 2.23zM.928 11.443a4.007 4.007 0 012.726-3.77l3.95.933.927 1.98-5.05 4.565a3.97 3.97 0 01-2.553-3.708m5.703-8.45a2.841 2.841 0 011.723.58l-.789 4.092-3.598-.85a2.842 2.842 0 01-.172-.986A2.84 2.84 0 016.63 2.992m2.66.59A5.92 5.92 0 0120.1 6.93c0 .4-.038.781-.114 1.164l-5.299 4.643-5.251-2.394-1.026-2.19zM24 12.571a4.723 4.723 0 00-3.124-4.454 6.695 6.695 0 00.126-1.29A6.789 6.789 0 0014.22.047 6.769 6.769 0 008.727 2.86a3.586 3.586 0 00-2.204-.754A3.604 3.604 0 003.15 6.959 4.786 4.786 0 000 11.431 4.727 4.727 0 003.139 15.9a6.876 6.876 0 00-.124 1.289 6.773 6.773 0 006.765 6.765c2.19 0 4.22-1.052 5.49-2.824a3.568 3.568 0 002.207.769 3.603 3.603 0 003.374-4.854A4.785 4.785 0 0024 12.572"/></svg></div>
+</div>
+</div>
+</div>
+<div id="nav">
+  <button onclick="go(-1)">&#8249;</button>
+  <div class="pips" id="pips"></div>
+  <button onclick="go(1)">&#8250;</button>
+  <span id="ctr">1 / 35</span>
+</div>
+<script>
+const SLIDES=document.querySelectorAll('.slide');const N=SLIDES.length;const KEY='o11y-sec';let cur=Math.min(+(localStorage.getItem(KEY)||0),N-1);const ctr=document.getElementById('ctr');const pips=document.getElementById('pips');SLIDES.forEach((_,i)=>{const d=document.createElement('div');d.className='pip';d.onclick=()=>show(i);pips.appendChild(d);});function show(n){SLIDES[cur].classList.remove('active');pips.children[cur].classList.remove('on');cur=(n+N)%N;SLIDES[cur].classList.add('active');pips.children[cur].classList.add('on');ctr.textContent=(cur+1)+' / '+N;localStorage.setItem(KEY,cur);}function go(d){show(cur+d);}show(cur);document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' '||e.key==='ArrowDown'){e.preventDefault();go(1);}else if(e.key==='ArrowLeft'||e.key==='ArrowUp'){e.preventDefault();go(-1);}else if(e.key==='Home')show(0);else if(e.key==='End')show(N-1);else if(e.key>='1'&&e.key<='9')show(+e.key-1);});function scale(){const deck=document.getElementById('deck');const sw=window.innerWidth,sh=window.innerHeight-42;const sc=Math.min(sw/1920,sh/1080);deck.style.transform='scale('+sc+')';deck.style.marginLeft=((sw-1920*sc)/2)+'px';deck.style.marginTop=((sh-1080*sc)/2)+'px';}window.addEventListener('resize',scale);scale();
+
+document.addEventListener('click', e => {
+  const link = e.target.closest('a[href^="#s"]');
+  if (link) {
+    e.preventDefault();
+    const targetId = link.getAttribute('href').substring(1);
+    const targetSlide = document.getElementById(targetId);
+    if (targetSlide) {
+      const slideIndex = Array.from(SLIDES).indexOf(targetSlide);
+      if (slideIndex >= 0) show(slideIndex);
+    }
+  }
+});
+
+</script>
+</body>
+</html>
