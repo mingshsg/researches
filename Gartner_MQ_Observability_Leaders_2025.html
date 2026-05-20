@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gartner MQ Observability Leaders 2025 — Strengths &amp; Weaknesses</title>
+<style>
+:root {
+  --bg: #080c12;
+  --bg2: #0e131c;
+  --card: #131a24;
+  --card2: #18202c;
+  --ink: #e8ecf4;
+  --ink2: #b0bac8;
+  --ink3: #6e7a90;
+  --green: #4ADE80;
+  --red: #FF6B6B;
+  --amber: #FEC514;
+  --cyan: #48EFCF;
+  --blue: #0B64DD;
+  --pink: #FF6B9D;
+  --purple: #A78BFA;
+  --border: rgba(255,255,255,0.05);
+  --border2: rgba(255,255,255,0.08);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: #000;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: var(--ink);
+  margin: 0; overflow: hidden;
+  width: 100vw; height: 100vh;
+}
+
+.deck {
+  width: 1920px; height: 1080px;
+  position: fixed;
+  top: 50%; left: 50%;
+  transform-origin: center center;
+  background: var(--bg);
+  overflow: hidden;
+}
+
+.slide {
+  position: absolute; inset: 0;
+  padding: 60px 90px 50px 90px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.4s ease;
+  display: flex; flex-direction: column;
+}
+.slide.active { opacity: 1; pointer-events: auto; }
+
+/* ── Navigation ── */
+.nav-counter {
+  position: absolute; bottom: 34px; right: 90px;
+  color: var(--ink3); font-size: 17px; font-weight: 500;
+  z-index: 20;
+}
+.nav-hint {
+  position: absolute; bottom: 34px; left: 90px;
+  color: var(--ink3); font-size: 15px; z-index: 20;
+}
+.footer-bar {
+  position: absolute; bottom: 30px; left: 90px; right: 90px;
+  height: 1px; background: var(--border); z-index: 19;
+}
+
+/* ── Title Slide ── */
+.title-slide { justify-content: center; align-items: center; text-align: center; }
+.title-slide .tl-eyebrow {
+  font-size: 22px; color: var(--ink3); letter-spacing: 4px;
+  text-transform: uppercase; margin-bottom: 28px; font-weight: 600;
+}
+.title-slide h1 {
+  font-size: 84px; font-weight: 800; letter-spacing: -2.5px; line-height: 1.05;
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, var(--cyan) 0%, var(--blue) 45%, var(--purple) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.title-slide .tl-sub {
+  font-size: 34px; color: var(--ink2); font-weight: 400; margin-bottom: 10px;
+}
+.title-slide .tl-meta {
+  font-size: 20px; color: var(--ink3); margin-bottom: 40px;
+}
+.title-slide .tl-badge {
+  display: inline-block;
+  background: rgba(72,239,207,0.08);
+  border: 1px solid rgba(72,239,207,0.18);
+  padding: 14px 36px; border-radius: 50px;
+  font-size: 18px; color: var(--cyan); font-weight: 600;
+}
+
+/* ── Section Divider ── */
+.section-slide { justify-content: center; align-items: center; text-align: center; }
+.section-slide h2 {
+  font-size: 62px; font-weight: 700; letter-spacing: -1px; margin-bottom: 18px;
+}
+.section-slide p {
+  font-size: 24px; color: var(--ink2); max-width: 820px; line-height: 1.5;
+}
+
+/* ── Vendor Slide ── */
+.vendor-top {
+  display: flex; align-items: center; gap: 28px; margin-bottom: 32px;
+}
+.vendor-badge {
+  width: 68px; height: 68px; border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 34px; font-weight: 800; color: #fff; flex-shrink: 0;
+}
+.vendor-top h2 {
+  font-size: 48px; font-weight: 700; letter-spacing: -1px;
+  background: linear-gradient(180deg, var(--ink) 0%, var(--ink2) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.vendor-byline {
+  font-size: 19px; color: var(--ink3); margin-bottom: 30px;
+  line-height: 1.5;
+}
+
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; flex: 1; min-height: 0; }
+
+.card-panel {
+  background: var(--card);
+  border-radius: 18px;
+  padding: 34px 32px 28px 32px;
+  border: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  transition: border-color 0.2s;
+}
+.card-panel h3 {
+  font-size: 28px; font-weight: 700; margin-bottom: 6px;
+  display: flex; align-items: center; gap: 10px;
+}
+.card-panel .card-sub {
+  font-size: 15px; color: var(--ink3); margin-bottom: 22px;
+  font-weight: 500; letter-spacing: 0.5px;
+}
+.card-panel ul { list-style: none; flex: 1; }
+.card-panel li {
+  font-size: 17px; line-height: 1.55; padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--ink2);
+}
+.card-panel li:last-child { border-bottom: none; padding-bottom: 0; }
+
+/* panels */
+.panel-str h3 { color: var(--green); }
+.panel-str .card-sub { color: rgba(74,222,128,0.5); }
+.panel-wk  h3 { color: var(--red); }
+.panel-wk  .card-sub { color: rgba(255,107,107,0.5); }
+
+/* keyword colors */
+.kw-ai     { color: var(--purple); font-weight: 600; }
+.kw-cost   { color: var(--amber); font-weight: 600; }
+.kw-tech   { color: var(--cyan);  font-weight: 600; }
+.kw-sec    { color: var(--pink);  font-weight: 600; }
+.kw-deploy { color: var(--green); font-weight: 600; }
+.kw-scale  { color: var(--blue);  font-weight: 600; }
+.kw-risk   { color: var(--red);   font-weight: 700; }
+
+.gartner-bar {
+  margin-top: 24px; padding: 15px 22px;
+  background: rgba(11,100,221,0.06);
+  border-left: 3px solid var(--blue);
+  border-radius: 0 10px 10px 0;
+  font-size: 15px; color: var(--ink2); line-height: 1.4;
+}
+.gartner-bar strong { color: var(--cyan); }
+
+/* ── Matrix ── */
+.matrix-wrap { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.matrix {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  flex: 1;
+}
+.matrix > div {
+  background: var(--card2);
+  padding: 13px 10px;
+  font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  text-align: center;
+}
+.matrix .mh {
+  background: var(--bg2);
+  font-weight: 700; font-size: 16px; color: var(--ink);
+  padding: 16px 10px;
+  letter-spacing: -0.3px;
+}
+.matrix .ml {
+  font-weight: 600; color: var(--ink);
+  justify-content: flex-start; padding-left: 18px;
+  font-size: 15px;
+}
+.matrix .stars {
+  font-size: 17px; letter-spacing: 2px;
+}
+
+.matrix-legend {
+  margin-top: 16px; font-size: 14px; color: var(--ink3); text-align: center;
+}
+
+/* ── Takeaways ── */
+.takeaway-wrap {
+  flex: 1; display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 1fr 1fr;
+  gap: 28px;
+  min-height: 0;
+}
+.takeaway-card {
+  background: var(--card);
+  border-radius: 18px;
+  padding: 30px 28px;
+  border: 1px solid var(--border);
+  display: flex; flex-direction: column;
+}
+.takeaway-num {
+  font-size: 52px; font-weight: 800; color: var(--cyan);
+  opacity: 0.6; margin-bottom: 10px; line-height: 1;
+}
+.takeaway-card h4 {
+  font-size: 23px; font-weight: 700; margin-bottom: 12px; color: var(--ink);
+}
+.takeaway-card p {
+  font-size: 16px; color: var(--ink2); line-height: 1.6;
+}
+.takeaway-card p strong { color: var(--ink); }
+
+/* ── Vendor accent backgrounds ── */
+.bg-dt { background: linear-gradient(135deg, #0a2a1a, #051a0e); }
+.bg-dd { background: linear-gradient(135deg, #2a1030, #1a0a20); }
+.bg-sp { background: linear-gradient(135deg, #0d2418, #081a10); }
+.bg-gf { background: linear-gradient(135deg, #2a200a, #1a1408); }
+.bg-el { background: linear-gradient(135deg, #0a1828, #061018); }
+.bg-nr { background: linear-gradient(135deg, #0a2028, #061420); }
+.bg-ib { background: linear-gradient(135deg, #0a1430, #060e20); }
+
+.badge-dt { background: linear-gradient(135deg, #1e4828, #003619); }
+.badge-dd { background: linear-gradient(135deg, #632CA6, #4a2080); }
+.badge-sp { background: linear-gradient(135deg, #1e3a2a, #0d2818); }
+.badge-gf { background: linear-gradient(135deg, #F2A900, #d49000); }
+.badge-el { background: linear-gradient(135deg, #00BFB3, #008f85); }
+.badge-nr { background: linear-gradient(135deg, #008C99, #006670); }
+.badge-ib { background: linear-gradient(135deg, #0f62fe, #0043ce); }
+
+/* star rating rendering */
+.sf { color: inherit; font-style: normal; }
+.se { opacity: 0.12; filter: grayscale(1); }
+.stars { letter-spacing: 1px; }
+
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+<!-- ═══════ S1: Title ═══════ -->
+<div class="slide active title-slide" id="s1">
+  <div class="tl-eyebrow">Gartner Magic Quadrant for Observability Platforms 2025</div>
+  <h1>Leaders Quadrant<br>Strengths &amp; Weaknesses</h1>
+  <div class="tl-sub">Comparative analysis of all 7 Gartner-recognized Leaders</div>
+  <div class="tl-meta">Based on Gartner MQ 2025, Gartner Peer Insights, and independent analyst reviews — May 2026</div>
+  <div class="tl-badge">✦ 7 Vendors &middot; 12 Dimensions &middot; 5-Star Ratings &middot; GenAI AIOps Included</div>
+</div>
+
+<!-- ═══════ S2: Dynatrace ═══════ -->
+<div class="slide bg-dt" id="s2">
+  <div class="vendor-top">
+    <div class="vendor-badge badge-dt">DT</div>
+    <div><h2>Dynatrace</h2></div>
+  </div>
+  <div class="vendor-byline">
+    <span class="kw-ai">Davis AI</span> causal engine &middot;
+    <span class="kw-tech">Grail</span> data lakehouse &middot;
+    <span class="kw-tech">Smartscape</span> topology &middot;
+    <em>Highest Gartner Ability to Execute</em>
+  </div>
+
+  <div class="split">
+    <div class="card-panel panel-str">
+      <h3>&#x25C6; Strengths</h3>
+      <div class="card-sub">AI-driven full-stack observability</div>
+      <ul>
+        <li><span class="kw-ai">Davis AI</span> delivers causal-AI root cause analysis with automated remediation — <span class="kw-ai">best-in-class AIOps</span></li>
+        <li><span class="kw-tech">Grail lakehouse</span> unifies logs, metrics, traces, RUM, and business events in one queryable store</li>
+        <li><span class="kw-tech">Smartscape</span> auto-discovers full-stack topology in real time — <span class="kw-deploy">zero manual config</span></li>
+        <li><span class="kw-sec">Application security</span> integrated — Runtime Vulnerability Analytics within the same platform</li>
+        <li><span class="kw-scale">Full-stack coverage</span>: infrastructure, APM, digital experience, business analytics</li>
+      </ul>
+    </div>
+    <div class="card-panel panel-wk">
+      <h3>&#x25C6; Weaknesses</h3>
+      <div class="card-sub">Where Dynatrace falls short</div>
+      <ul>
+        <li><span class="kw-ai">Davis AI alert fatigue</span> — <span class="kw-risk">high false-positive rate</span> in complex microservice topologies; teams report manually verifying most RCA findings</li>
+        <li><span class="kw-cost">Premium pricing</span> — among the most expensive platforms; DPS (Dynatrace Platform Subscription) consumption model can exceed $100K+/yr for mid-size environments</li>
+        <li><span class="kw-risk">Proprietary lock-in</span> — OneAgent and DQL create migration friction; full re-instrumentation required</li>
+        <li><span class="kw-deploy">Limited air-gapped / on-prem</span> — cloud-first architecture challenges regulated environments</li>
+        <li><span class="kw-deploy">Steep learning curve</span> for custom dashboards and DQL beyond built-in views</li>
+      </ul>
+    </div>
+  </div>
+  <div class="gartner-bar">
+    <strong>Gartner MQ 2025: Leader — #1 Ability to Execute</strong> &middot; Best for: Causal-AIOps enterprises needing deterministic root cause at scale &middot; <span class="kw-deploy">SG SaaS: AWS</span> &middot; <span class="kw-risk">On-Prem: Deprecated</span>
+  </div>
+</div>
+
+<!-- ═══════ S3: Datadog ═══════ -->
+<div class="slide bg-dd" id="s3">
+  <div class="vendor-top">
+    <div class="vendor-badge badge-dd">DD</div>
+    <div><h2>Datadog</h2></div>
+  </div>
+  <div class="vendor-byline">
+    <span class="kw-scale">Largest install base</span> &middot;
+    <span class="kw-tech">900+ integrations</span> &middot;
+    <span class="kw-ai">Watchdog AI</span> &middot;
+    <em>Broadest ecosystem of any Leader</em>
+  </div>
+
+  <div class="split">
+    <div class="card-panel panel-str">
+      <h3>&#x25C6; Strengths</h3>
+      <div class="card-sub">Cloud-native breadth and developer velocity</div>
+      <ul>
+        <li><span class="kw-scale">Largest install base</span> — 47K+ customers, dominant in cloud-native DevOps teams</li>
+        <li><span class="kw-tech">900+ turnkey integrations</span> — the broadest ecosystem by a wide margin</li>
+        <li><span class="kw-tech">Kubernetes monitoring</span> is superb — auto-discovery of ephemeral pods and services</li>
+        <li><span class="kw-ai">Watchdog AI</span> provides automated anomaly detection with <span class="kw-deploy">minimal configuration</span></li>
+        <li><span class="kw-deploy">Excellent developer UX</span> — intuitive dashboards, Notebooks, and a powerful REST API</li>
+      </ul>
+    </div>
+    <div class="card-panel panel-wk">
+      <h3>&#x25C6; Weaknesses</h3>
+      <div class="card-sub">Where Datadog falls short</div>
+      <ul>
+        <li><span class="kw-cost">Unpredictable costs</span> — per-host + per-metric + per-log pricing causes <span class="kw-risk">frequent bill shock</span></li>
+        <li><span class="kw-cost">Custom metrics trap</span> — Kubernetes labels auto-generate thousands of custom metrics, driving hidden spikes</li>
+        <li><span class="kw-deploy">SaaS-only</span> — <span class="kw-risk">no on-premises deployment</span>; strict data-sovereignty environments are locked out</li>
+        <li><span class="kw-risk">Vendor lock-in</span> — proprietary agent, query language, and dashboard format complicate migration</li>
+        <li><span class="kw-cost">Log costs escalate fast</span> — many teams disable or heavily sample logs to control spend</li>
+      </ul>
+    </div>
+  </div>
+  <div class="gartner-bar">
+    <strong>Gartner MQ 2025: Leader</strong> &middot; Best for: Cloud-native DevOps teams wanting breadth, integrations, and fast time-to-dashboard &middot; <span class="kw-risk">SG SaaS: None</span> &middot; <span class="kw-risk">On-Prem: None</span>
+  </div>
+</div>
+
+<!-- ═══════ S4: Splunk ═══════ -->
+<div class="slide bg-sp" id="s4">
+  <div class="vendor-top">
+    <div class="vendor-badge badge-sp">SP</div>
+    <div><h2>Splunk</h2></div>
+  </div>
+  <div class="vendor-byline">
+    <span class="kw-sec">Leading SIEM market share</span> &middot;
+    <span class="kw-tech">SPL</span> query language &middot;
+    <span class="kw-scale">Petabyte-scale</span> analytics &middot;
+    <em>Cisco-owned, separate O11y and Security products</em>
+  </div>
+
+  <div class="split">
+    <div class="card-panel panel-str">
+      <h3>&#x25C6; Strengths</h3>
+      <div class="card-sub">Unrivaled log analytics at petabyte scale</div>
+      <ul>
+        <li><span class="kw-tech">SPL</span> is the <span class="kw-scale">industry standard</span> for large-scale log investigation — unmatched query power</li>
+        <li><span class="kw-sec">Security + O11y brand portfolio</span> — separate Observability Cloud and Enterprise Security products share the Splunk platform backplane, but <span class="kw-risk">separate licensing, deployment, and UIs</span></li>
+        <li><span class="kw-tech">Observability Cloud</span> unifies APM (SignalFx), infra, RUM, and log analytics</li>
+        <li><span class="kw-scale">Petabyte-scale stream processing</span> — purpose-built for massive ingestion demands</li>
+        <li><span class="kw-tech">Cisco acquisition</span> adds networking depth (ThousandEyes) and AppDynamics cross-sell potential</li>
+      </ul>
+    </div>
+    <div class="card-panel panel-wk">
+      <h3>&#x25C6; Weaknesses</h3>
+      <div class="card-sub">Where Splunk falls short</div>
+      <ul>
+        <li><span class="kw-cost">Extremely expensive at scale</span> — per-GB ingestion pricing makes observability <span class="kw-risk">cost-prohibitive</span> for high-volume telemetry</li>
+        <li><span class="kw-risk">Fragmented portfolio</span> — overlapping capabilities across Observability Cloud, Enterprise, and SignalFx</li>
+        <li><span class="kw-risk">Cisco acquisition uncertainty</span> — roadmap, licensing, and support quality concerns persist in the community</li>
+        <li><span class="kw-tech">OTel instrumentation</span> described by users as <span class="kw-risk">"complicated and oftentimes obsolete"</span></li>
+        <li><span class="kw-deploy">SPL learning curve</span> is steep — powerful but not intuitive without dedicated Splunk admins</li>
+      </ul>
+    </div>
+  </div>
+  <div class="gartner-bar">
+    <strong>Gartner MQ 2025: Leader</strong> &middot; Best for: Petabyte-scale log analytics with strong (but separate) SIEM portfolio &middot; <span class="kw-deploy">SG SaaS: AWS+GCP</span> &middot; <span class="kw-cost">On-Prem: Logs only</span>
+  </div>
+</div>
+
+<!-- ═══════ S5: Grafana Labs ═══════ -->
+<div class="slide bg-gf" id="s5">
+  <div class="vendor-top">
+    <div class="vendor-badge badge-gf">G</div>
+    <div><h2>Grafana Labs</h2></div>
+  </div>
+  <div class="vendor-byline">
+    <span class="kw-deploy">2nd consecutive Leader</span> &middot;
+    <span class="kw-tech">LGTM stack</span> (Loki &middot; Grafana &middot; Tempo &middot; Mimir) &middot;
+    <em>Open-source champion with 26K+ companies</em>
+  </div>
+
+  <div class="split">
+    <div class="card-panel panel-str">
+      <h3>&#x25C6; Strengths</h3>
+      <div class="card-sub">Open-source flexibility and visualization leadership</div>
+      <ul>
+        <li><span class="kw-deploy">Open-source DNA</span> — LGTM stack provides a <span class="kw-deploy">fully open alternative</span> to proprietary SaaS lock-in</li>
+        <li><span class="kw-tech">Unmatched visualization</span> — Grafana dashboards are the <span class="kw-scale">de facto industry standard</span></li>
+        <li><span class="kw-tech">Massive plugin ecosystem</span> — endless data source connectors; vibrant community</li>
+        <li><span class="kw-tech">Strongest OTel alignment</span> — <span class="kw-deploy">natively supports OpenTelemetry</span> without proprietary collectors</li>
+        <li><span class="kw-cost">Strong cost profile</span> — open-source core is free; Cloud Pro adds enterprise features (SSO/RBAC/audit) at competitive pricing</li>
+      </ul>
+    </div>
+    <div class="card-panel panel-wk">
+      <h3>&#x25C6; Weaknesses</h3>
+      <div class="card-sub">Where Grafana Labs falls short</div>
+      <ul>
+        <li><span class="kw-ai">Weak AI/AIOps</span> — no <span class="kw-risk">mature automated root cause analysis</span> comparable to Davis AI or Watchdog</li>
+        <li><span class="kw-tech">Fragmented backend</span> — Loki, Tempo, Mimir are separate systems requiring individual tuning and expertise</li>
+        <li><span class="kw-deploy">Self-managed complexity</span> — open-source stack demands <span class="kw-risk">significant in-house SRE expertise</span> at scale</li>
+        <li><span class="kw-tech">Limited APM depth</span> — lacks code-level profiling and business-transaction tracing of Dynatrace/Datadog</li>
+        <li><span class="kw-tech">Enterprise features lag</span> — RBAC, audit logging, and reporting are less mature than commercial-first platforms</li>
+      </ul>
+    </div>
+  </div>
+  <div class="gartner-bar">
+    <strong>Gartner MQ 2025: Leader (2nd consecutive year)</strong> &middot; Best for: Open-source-first teams prioritizing flexibility, community, and competitive TCO &middot; <span class="kw-deploy">SG SaaS: AWS+GCP</span> &middot; <span class="kw-deploy">On-Prem: Full parity</span>
+  </div>
+</div>
+
+<!-- ═══════ S6: Elastic ═══════ -->
+<div class="slide bg-el" id="s6">
+  <div class="vendor-top">
+    <div class="vendor-badge badge-el">EL</div>
+    <div><h2>Elastic</h2></div>
+  </div>
+  <div class="vendor-byline">
+    <span class="kw-tech">OTel-native</span> &middot;
+    <span class="kw-ai">AI Assistant + ES|QL</span> &middot;
+    <span class="kw-ai">Agent Builder</span> &middot;
+    <span class="kw-sec">Unified O11y + Security</span> &middot;
+    <em>Search-powered observability + GenAI-driven operations</em>
+  </div>
+
+  <div class="split">
+    <div class="card-panel panel-str">
+      <h3>&#x25C6; Strengths</h3>
+      <div class="card-sub">Search-powered + GenAI-driven observability</div>
+      <ul>
+        <li><span class="kw-ai">Elastic Agent Builder</span> — <span class="kw-ai">GenAI-powered</span> integration builder; create custom agents and data pipelines from natural language</li>
+        <li><span class="kw-tech">Elasticsearch-powered search</span> — unmatched <span class="kw-scale">log correlation and ad-hoc investigation</span> speed</li>
+        <li><span class="kw-tech">OTel-native architecture</span> — deeply committed to <span class="kw-deploy">OpenTelemetry</span>, reducing vendor lock-in</li>
+        <li><span class="kw-sec">Unified O11y + SIEM</span> — single platform for logs, metrics, traces, APM, <span class="kw-sec">and security</span> under one license</li>
+        <li><span class="kw-ai">AI Assistant with ES|QL</span> — natural-language querying with automated insights and root cause suggestions</li>
+        <li><span class="kw-deploy">Maximum deployment flexibility</span> — <span class="kw-deploy">SaaS, on-prem, hybrid, air-gapped</span> — strongest optionality of any Leader</li>
+      </ul>
+    </div>
+    <div class="card-panel panel-wk">
+      <h3>&#x25C6; Weaknesses</h3>
+      <div class="card-sub">Where Elastic falls short</div>
+      <ul>
+        <li><span class="kw-tech">APM depth trails</span> Dynatrace/Datadog — code-level profiling and <span class="kw-risk">automatic service mapping</span> are less mature</li>
+        <li><span class="kw-tech">Kibana visualizations</span> are improving but still less polished than Grafana for custom dashboards</li>
+        <li><span class="kw-deploy">Self-managed complexity</span> — operating Elasticsearch clusters at scale requires <span class="kw-risk">significant tuning expertise</span></li>
+        <li><span class="kw-risk">Market perception gap</span> — still seen primarily as "log/search" rather than full observability in some segments</li>
+        <li><span class="kw-ai">AI augments, doesn't auto-diagnose</span> — Assistant accelerates investigation but doesn't auto-generate root cause like Davis; teams still drive the RCA workflow</li>
+      </ul>
+    </div>
+  </div>
+  <div class="gartner-bar">
+    <strong>Gartner MQ 2025: Leader &middot; Also 2025 IDC MarketScape Leader</strong> &middot; Best for: GenAI-driven operations + unified observability/security with full deployment choice &middot; <span class="kw-deploy">SG SaaS: AWS+Azure+GCP</span> &middot; <span class="kw-deploy">On-Prem: Full parity</span>
+  </div>
+</div>
+
+<!-- ═══════ S7: New Relic ═══════ -->
+<div class="slide bg-nr" id="s7">
+  <div class="vendor-top">
+    <div class="vendor-badge badge-nr">NR</div>
+    <div><h2>New Relic</h2></div>
+  </div>
+  <div class="vendor-byline">
+    <span class="kw-scale">175K+ companies</span> &middot;
+    <span class="kw-deploy">100 GB/mo free tier</span> &middot;
+    <span class="kw-cost">Consumption pricing</span> &middot;
+    <em>Developer-first observability with the lowest barrier to entry</em>
+  </div>
+
+  <div class="split">
+    <div class="card-panel panel-str">
+      <h3>&#x25C6; Strengths</h3>
+      <div class="card-sub">Accessible developer-first observability</div>
+      <ul>
+        <li><span class="kw-cost">Generous free tier</span> — <span class="kw-deploy">100 GB/month ingest</span>; lowest barrier to entry among all Leaders</li>
+        <li><span class="kw-tech">Strong language agents</span> — deep code-level insights for Java, .NET, Node, Python, Go, Ruby, PHP</li>
+        <li><span class="kw-cost">Consumption-based pricing</span> — pay for what you use; <span class="kw-cost">more predictable</span> than host-based models</li>
+        <li><span class="kw-scale">175K+ active install base</span> — massive community, robust documentation, and extensive learning resources</li>
+        <li><span class="kw-tech">NRQL</span> is approachable — lower learning curve than SPL or Elasticsearch DSL</li>
+      </ul>
+    </div>
+    <div class="card-panel panel-wk">
+      <h3>&#x25C6; Weaknesses</h3>
+      <div class="card-sub">Where New Relic falls short</div>
+      <ul>
+        <li><span class="kw-ai">AI/AIOps lags significantly</span> — alerts fire but <span class="kw-risk">don't provide automated root cause analysis</span> at Dynatrace/Datadog levels</li>
+        <li><span class="kw-cost">Consumption surprises at scale</span> — data ingest costs compound quickly for high-throughput environments</li>
+        <li><span class="kw-sec">No integrated SIEM</span> — <span class="kw-risk">zero security observability</span>; teams must pair with separate security tools</li>
+        <li><span class="kw-risk">UI refresh churn</span> — frequent redesigns frustrate long-time users and disrupt established workflows</li>
+        <li><span class="kw-tech">Enterprise governance</span> — RBAC granularity and audit logging trail Splunk and Dynatrace</li>
+      </ul>
+    </div>
+  </div>
+  <div class="gartner-bar">
+    <strong>Gartner MQ 2025: Leader</strong> &middot; Best for: Developer-first teams wanting quick time-to-value with low upfront commitment &middot; <span class="kw-risk">SG SaaS: None</span> &middot; <span class="kw-risk">On-Prem: None</span>
+  </div>
+</div>
+
+<!-- ═══════ S8: IBM Instana ═══════ -->
+<div class="slide bg-ib" id="s8">
+  <div class="vendor-top">
+    <div class="vendor-badge badge-ib">IB</div>
+    <div><h2>IBM Instana</h2></div>
+  </div>
+  <div class="vendor-byline">
+    <span class="kw-tech">Zero-config auto-tracing</span> &middot;
+    <span class="kw-scale">Sub-second granularity</span> &middot;
+    <span class="kw-ai">Watsonx AI alignment</span> &middot;
+    <em>Microservices-first observability with hands-off instrumentation</em>
+  </div>
+
+  <div class="split">
+    <div class="card-panel panel-str">
+      <h3>&#x25C6; Strengths</h3>
+      <div class="card-sub">Automatic instrumentation for microservices</div>
+      <ul>
+        <li><span class="kw-deploy">Zero-config auto-tracing</span> — discovers and instruments microservices <span class="kw-deploy">without manual code changes</span></li>
+        <li><span class="kw-scale">Sub-second granularity</span> — captures every transaction at 1-second resolution; <span class="kw-tech">no sampled aggregates</span></li>
+        <li><span class="kw-tech">Deep Kubernetes-native</span> — auto-maps pods, services, deployments with real-time topology</li>
+        <li><span class="kw-tech">IBM ecosystem integration</span> — strong alignment with <span class="kw-ai">Watsonx AI</span>, IBM Cloud, and enterprise middleware</li>
+        <li><span class="kw-deploy">Lightweight agent</span> — lower overhead than Dynatrace OneAgent in resource-constrained environments</li>
+      </ul>
+    </div>
+    <div class="card-panel panel-wk">
+      <h3>&#x25C6; Weaknesses</h3>
+      <div class="card-sub">Where IBM Instana falls short</div>
+      <ul>
+        <li><span class="kw-tech">Narrow integration ecosystem</span> — far fewer connectors than Datadog (900+) or Splunk for <span class="kw-risk">non-IBM environments</span></li>
+        <li><span class="kw-tech">Limited log management</span> — Instana focuses on metrics/traces; <span class="kw-risk">enterprises often need a separate log platform</span></li>
+        <li><span class="kw-risk">IBM brand perception</span> — viewed as "the IBM tool"; can deter non-IBM shops evaluating neutral platforms</li>
+        <li><span class="kw-scale">Smaller community</span> — fewer third-party plugins, extensions, and community resources than any other Leader</li>
+        <li><span class="kw-tech">Dashboard customization</span> is more limited than Grafana or Kibana — less flexibility for bespoke views</li>
+      </ul>
+    </div>
+  </div>
+  <div class="gartner-bar">
+    <strong>Gartner MQ 2025: Leader</strong> &middot; Best for: Microservices-heavy enterprises in the IBM ecosystem seeking hands-off instrumentation &middot; <span class="kw-deploy">SG SaaS: IBM Cloud</span> &middot; <span class="kw-deploy">On-Prem: Strong parity</span>
+  </div>
+</div>
+
+<!-- ═══════ S9: Comparison Matrix (1–5 Stars) ═══════ -->
+<div class="slide" id="s9">
+  <div style="margin-bottom:24px;">
+    <h2 style="font-size:42px;font-weight:700;background:linear-gradient(180deg,var(--ink),var(--ink2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Comparative Matrix &mdash; 12 Dimensions</h2>
+    <p style="font-size:18px;color:var(--ink2);margin-top:4px;">Ratings: 1&ndash;5 stars across 12 dimensions &times; 7 Gartner MQ Leaders &mdash; higher is better</p>
+  </div>
+
+  <div class="matrix-wrap">
+    <div class="matrix">
+      <!-- header -->
+      <div class="mh">Dimension</div>
+      <div class="mh">Dynatrace</div>
+      <div class="mh">Datadog</div>
+      <div class="mh">Splunk</div>
+      <div class="mh">Grafana</div>
+      <div class="mh">Elastic</div>
+      <div class="mh">New Relic</div>
+      <div class="mh">IBM Instana</div>
+
+      <!-- AIOps / Root Cause Analysis -->
+      <div class="ml">ML AIOps / RCA</div>
+      <div class="stars" style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span></div>
+      <div class="stars" style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#FEC514;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#FF6B6B;"><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#FEC514;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#FF6B6B;"><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#FF6B6B;"><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span><span class="se">☆</span></div>
+
+      <!-- GenAI AIOps / LLM-Powered Ops -->
+      <div class="ml">GenAI AIOps</div>
+      <div class="stars" style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#FEC514;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#FF6B6B;"><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span></div>
+      <div class="stars" style="color:#FEC514;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#FEC514;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span></div>
+
+      <!-- APM / Code-Level Depth -->
+      <div class="ml">APM Depth</div>
+      <div class="stars" style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span></div>
+      <div class="stars" style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#FEC514;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#FF6B6B;"><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#FEC514;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span></div>
+
+      <!-- Log Analytics at Scale -->
+      <div class="ml">Log Analytics</div>
+      <div class="stars" style="color:#FEC514;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#FEC514;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span></div>
+      <div class="stars" style="color:#FEC514;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span></div>
+      <div class="stars" style="color:#FEC514;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#FF6B6B;"><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span><span class="se">☆</span></div>
+
+      <!-- Cost Efficiency / TCO -->
+      <div class="ml">Cost Efficiency</div>
+      <div class="stars" style="color:#FF6B6B;"><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#FF6B6B;"><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#FF6B6B;"><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#FEC514;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span></div>
+
+      <!-- OpenTelemetry Alignment -->
+      <div class="ml">OpenTelemetry</div>
+      <div class="stars" style="color:#FEC514;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#FEC514;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#FF6B6B;"><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span></div>
+      <div class="stars" style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span></div>
+      <div class="stars" style="color:#FEC514;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#FEC514;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span></div>
+
+      <!-- Deployment Flexibility -->
+      <div class="ml">Deploy Flexibility</div>
+      <div class="stars" style="color:#FEC514;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#FF6B6B;"><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#FEC514;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span></div>
+      <div class="stars" style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span></div>
+      <div class="stars" style="color:#FF6B6B;"><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#FEC514;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span></div>
+
+      <!-- Integration Ecosystem -->
+      <div class="ml">Integrations</div>
+      <div class="stars" style="color:#FEC514;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span></div>
+      <div class="stars" style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span></div>
+      <div class="stars" style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#FF6B6B;"><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span><span class="se">☆</span></div>
+
+      <!-- Security Convergence -->
+      <div class="ml">Security + O11y</div>
+      <div class="stars" style="color:#FEC514;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#FEC514;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#FF6B6B;"><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span></div>
+      <div class="stars" style="color:#FF6B6B;"><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#FF6B6B;"><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span><span class="se">☆</span><span class="se">☆</span></div>
+
+      <!-- Time to Value -->
+      <div class="ml">Time to Value</div>
+      <div class="stars" style="color:#FEC514;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#FF6B6B;"><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#FEC514;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#FEC514;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span></div>
+      <div class="stars" style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span></div>
+
+      <!-- Singapore SaaS Region Availability -->
+      <div class="ml">Singapore SaaS</div>
+      <div class="stars" style="color:#FEC514;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#FF6B6B;"><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span></div>
+      <div class="stars" style="color:#FF6B6B;"><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#FEC514;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span></div>
+
+      <!-- On-Prem Feature Parity -->
+      <div class="ml">On-Prem Parity</div>
+      <div class="stars" style="color:#FF6B6B;"><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#FF6B6B;"><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#FEC514;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span></div>
+      <div class="stars" style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span></div>
+      <div class="stars" style="color:#FF6B6B;"><span class="sf">★</span><span class="se">☆</span><span class="se">☆</span><span class="se">☆</span><span class="se">☆</span></div>
+      <div class="stars" style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="se">☆</span></div>
+    </div>
+
+    <div class="matrix-legend">
+      <span style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span></span> = Best-in-class &ensp;
+      <span style="color:#4ADE80;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span></span><span style="opacity:0.15;">☆</span> = Strong &ensp;
+      <span style="color:#FEC514;"><span class="sf">★</span><span class="sf">★</span><span class="sf">★</span></span><span style="opacity:0.15;">☆☆</span> = Competitive &ensp;
+      <span style="color:#FF6B6B;"><span class="sf">★</span><span class="sf">★</span></span><span style="opacity:0.15;">☆☆☆</span> = Developing &ensp;
+      <span style="color:#FF6B6B;"><span class="sf">★</span></span><span style="opacity:0.15;">☆☆☆☆</span> = Weak
+      &emsp;|&emsp; Based on Gartner MQ 2025, Peer Insights, and independent analyst reviews — May 2026
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ S10: Selection Strategy ═══════ -->
+<div class="slide" id="s10">
+  <div style="margin-bottom:24px;">
+    <h2 style="font-size:46px;font-weight:700;background:linear-gradient(180deg,var(--ink),var(--ink2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Selection Strategy — 2026 Decision Framework</h2>
+    <p style="font-size:20px;color:var(--ink2);margin-top:4px;">No single platform wins every scenario. Match the platform to your primary constraint.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1.05fr;gap:32px;flex:1;min-height:0;">
+
+    <!-- LEFT: 2×3 scenario grid -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(3,1fr);gap:14px;min-height:0;">
+
+      <div style="background:var(--card);border-radius:14px;padding:22px 24px;border:1px solid var(--border);border-left:4px solid var(--cyan);display:flex;flex-direction:column;justify-content:center;">
+        <div style="font-size:16px;font-weight:700;color:var(--cyan);margin-bottom:6px;"><span class="kw-deploy">REGULATED</span></div>
+        <div style="font-size:17px;color:var(--ink2);line-height:1.45;">Air-gapped, on-prem,<br>data sovereignty</div>
+        <div style="font-size:17px;color:var(--ink);margin-top:8px;font-weight:600;">Elastic or Grafana</div>
+      </div>
+
+      <div style="background:var(--card);border-radius:14px;padding:22px 24px;border:1px solid var(--border);border-left:4px solid var(--pink);display:flex;flex-direction:column;justify-content:center;">
+        <div style="font-size:16px;font-weight:700;color:var(--pink);margin-bottom:6px;"><span class="kw-sec">SECURITY + O11Y</span></div>
+        <div style="font-size:17px;color:var(--ink2);line-height:1.45;">Unified platform — one license, one UI, one data store</div>
+        <div style="font-size:17px;color:var(--ink);margin-top:8px;font-weight:600;">Elastic</div>
+      </div>
+
+      <div style="background:var(--card);border-radius:14px;padding:22px 24px;border:1px solid var(--border);border-left:4px solid var(--amber);display:flex;flex-direction:column;justify-content:center;">
+        <div style="font-size:16px;font-weight:700;color:var(--amber);margin-bottom:6px;"><span class="kw-cost">COST-SENSITIVE</span></div>
+        <div style="font-size:17px;color:var(--ink2);line-height:1.45;">Predictable TCO. Avoid Datadog (bill shock), Splunk (per-GB), Dynatrace (per-host)</div>
+        <div style="font-size:17px;color:var(--ink);margin-top:8px;font-weight:600;">Elastic, Grafana, New Relic</div>
+      </div>
+
+      <div style="background:var(--card);border-radius:14px;padding:22px 24px;border:1px solid var(--border);border-left:4px solid var(--purple);display:flex;flex-direction:column;justify-content:center;">
+        <div style="font-size:16px;font-weight:700;color:var(--purple);margin-bottom:6px;"><span class="kw-ai">GENAI OPS</span></div>
+        <div style="font-size:17px;color:var(--ink2);line-height:1.45;">AI-driven pipeline building + investigation. Industry-first Agent Builder</div>
+        <div style="font-size:17px;color:var(--ink);margin-top:8px;font-weight:600;">Elastic</div>
+      </div>
+
+      <div style="background:var(--card);border-radius:14px;padding:22px 24px;border:1px solid var(--border);border-left:4px solid var(--green);display:flex;flex-direction:column;justify-content:center;">
+        <div style="font-size:16px;font-weight:700;color:var(--green);margin-bottom:6px;"><span class="kw-deploy">FAST START</span></div>
+        <div style="font-size:17px;color:var(--ink2);line-height:1.45;">Best free tier + dashboards in hours, not weeks</div>
+        <div style="font-size:17px;color:var(--ink);margin-top:8px;font-weight:600;">New Relic or Datadog</div>
+      </div>
+
+      <div style="background:var(--card);border-radius:14px;padding:22px 24px;border:1px solid var(--border);border-left:4px solid var(--blue);display:flex;flex-direction:column;justify-content:center;">
+        <div style="font-size:16px;font-weight:700;color:var(--blue);margin-bottom:6px;"><span class="kw-deploy">APAC / SINGAPORE</span></div>
+        <div style="font-size:17px;color:var(--ink2);line-height:1.45;">SaaS region required. Avoid New Relic (no APAC SaaS), Datadog (no Singapore region)</div>
+        <div style="font-size:17px;color:var(--ink);margin-top:8px;font-weight:600;">Elastic (3 clouds), Splunk, Grafana</div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: Recommendation panel -->
+    <div style="background:var(--card);border-radius:20px;padding:32px 34px 28px 34px;border:1px solid var(--border);display:flex;flex-direction:column;">
+
+      <div style="font-size:13px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:3px;margin-bottom:20px;text-align:center;">If You Must Pick One</div>
+
+      <div style="font-size:56px;font-weight:800;background:linear-gradient(135deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:14px;line-height:1;text-align:center;">Elastic</div>
+
+      <p style="font-size:17px;color:var(--ink2);line-height:1.5;margin-bottom:16px;text-align:center;">Leads <strong style="color:var(--ink);">7 of 12 dimensions at ★★★★★</strong> — more than any other vendor</p>
+
+      <!-- stat grid -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 18px;margin-bottom:14px;">
+        <div style="font-size:15px;padding:5px 0;"><span style="color:var(--green);">★</span> <span class="kw-ai">GenAI AIOps</span> ★★★★★</div>
+        <div style="font-size:15px;padding:5px 0;"><span style="color:var(--green);">★</span> <span class="kw-sec">Security + O11y</span> ★★★★★</div>
+        <div style="font-size:15px;padding:5px 0;"><span style="color:var(--green);">★</span> <span class="kw-tech">Log Analytics</span> ★★★★★</div>
+        <div style="font-size:15px;padding:5px 0;"><span style="color:var(--green);">★</span> <span class="kw-tech">OpenTelemetry</span> ★★★★★</div>
+        <div style="font-size:15px;padding:5px 0;"><span style="color:var(--green);">★</span> <span class="kw-deploy">Deploy Flex</span> ★★★★★</div>
+        <div style="font-size:15px;padding:5px 0;"><span style="color:var(--green);">★</span> <span class="kw-deploy">Singapore SaaS</span> ★★★★★</div>
+        <div style="font-size:15px;padding:5px 0;"><span style="color:var(--green);">★</span> <span class="kw-deploy">On-Prem Parity</span> ★★★★★</div>
+        <div style="font-size:15px;padding:5px 0;"><span style="color:var(--green);">★</span> <span class="kw-cost">Cost Efficiency</span> ★★★★☆</div>
+      </div>
+
+      <p style="font-size:15px;color:var(--ink2);line-height:1.55;margin-bottom:10px;padding-top:10px;border-top:1px solid var(--border);"><strong style="color:var(--cyan);">Why:</strong> OTel-native = portable investment. Agent Builder = no competitor match. Converged platform = no dual-platform tax. Deploy flexibility unlocks regulated markets.</p>
+
+      <p style="font-size:14px;color:var(--ink3);line-height:1.45;flex:1;"><strong style="color:var(--ink2);">Watch for:</strong> ML AIOps trails Dynatrace. Integrations breadth trails Datadog. APM/UX good, not class-leading. Not the pick if deterministic push-button RCA is your #1 requirement.</p>
+
+      <div style="padding:14px 18px;background:rgba(72,239,207,0.06);border-radius:10px;font-size:15px;color:var(--cyan);text-align:center;font-weight:600;">
+        Best balance for 2026–2027: GenAI ops + convergence + portability
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════ S11: Key Takeaways ═══════ -->
+<div class="slide" id="s11">
+  <div style="margin-bottom:26px;">
+    <h2 style="font-size:42px;font-weight:700;background:linear-gradient(180deg,var(--ink),var(--ink2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Key Takeaways</h2>
+  </div>
+
+  <div class="takeaway-wrap">
+    <div class="takeaway-card">
+      <div class="takeaway-num">01</div>
+      <h4><span class="kw-ai">AI</span> Is the Biggest Differentiator</h4>
+      <p><span class="kw-ai">Dynatrace Davis</span> leads with causal AI for automated RCA. Datadog Watchdog follows. The rest are catching up. <strong>If automated root cause analysis is critical, Dynatrace sets the benchmark.</strong></p>
+    </div>
+    <div class="takeaway-card">
+      <div class="takeaway-num">02</div>
+      <h4><span class="kw-cost">Cost</span> Is the #1 Buyer Complaint</h4>
+      <p>Datadog, Splunk, and Dynatrace all face <span class="kw-cost">bill-shock criticism</span>. Grafana, Elastic, and New Relic all offer meaningfully lower TCO — but even the "cheap" options require paid tiers for SSO, RBAC, and audit at enterprise scale. <strong>Nobody is truly cheap at scale — the question is predictability, not price.</strong></p>
+    </div>
+    <div class="takeaway-card">
+      <div class="takeaway-num">03</div>
+      <h4><span class="kw-tech">OpenTelemetry</span> Is Reshaping Lock-In</h4>
+      <p>Elastic and Grafana lead OTel adoption. Splunk lags. <strong>OTel-native platforms reduce switching costs — a growing threat to proprietary-agent vendors.</strong></p>
+    </div>
+    <div class="takeaway-card">
+      <div class="takeaway-num">04</div>
+      <h4><span class="kw-sec">Security + O11y</span> Convergence Is Rising</h4>
+      <p><span class="kw-sec">Elastic</span> uniquely delivers fully unified observability + SIEM in one platform (same license, UI, data store). Splunk has both but as <span class="kw-risk">separate products</span>. Datadog Cloud SIEM is integrated. <strong>True convergence — not brand portfolio — is the growing buyer requirement.</strong></p>
+    </div>
+    <div class="takeaway-card">
+      <div class="takeaway-num">05</div>
+      <h4><span class="kw-deploy">Deployment Flexibility</span> Unlocks Regulated Markets</h4>
+      <p>Grafana and Elastic support <span class="kw-deploy">on-prem, cloud, hybrid, and air-gapped</span>. Datadog and New Relic are SaaS-only. <strong>Data-sovereignty requirements favor flexible deployment.</strong></p>
+    </div>
+    <div class="takeaway-card">
+      <div class="takeaway-num">06</div>
+      <h4>No Single "Best" Platform Exists</h4>
+      <p>Every Leader owns a distinct niche: <span class="kw-ai">causal AIOps</span> (Dynatrace), <span class="kw-scale">breadth</span> (Datadog), <span class="kw-sec">security+scale</span> (Splunk), <span class="kw-deploy">openness</span> (Grafana), <span class="kw-ai">GenAI ops + convergence</span> (Elastic), <span class="kw-deploy">accessibility</span> (New Relic), <span class="kw-tech">auto-instrumentation</span> (Instana). <strong>Match the platform to your architecture and budget — not the other way around.</strong></p>
+    </div>
+  </div>
+</div>
+
+<!-- ── Navigation ── -->
+<div class="footer-bar"></div>
+<div class="nav-hint">&#x2190; &#x2192; arrow keys &middot; click left/right to navigate &middot; Home to restart</div>
+<div class="nav-counter" id="navCounter">1 / 11</div>
+
+</div>
+
+<script>
+const SLIDES = document.querySelectorAll('.slide');
+const deck = document.getElementById('deck');
+const counter = document.getElementById('navCounter');
+let cur = 0;
+
+function show(n) {
+  SLIDES[cur].classList.remove('active');
+  cur = ((n % SLIDES.length) + SLIDES.length) % SLIDES.length;
+  SLIDES[cur].classList.add('active');
+  counter.textContent = (cur + 1) + ' / ' + SLIDES.length;
+  try { localStorage.setItem('gmq-obsv2-slide', cur); } catch(e) {}
+}
+
+function scaleDeck() {
+  var s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+  deck.style.transform = 'translate(-50%, -50%) scale(' + s + ')';
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') show(cur + 1);
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   show(cur - 1);
+  if (e.key === 'Home') show(0);
+});
+
+deck.addEventListener('click', function(e) {
+  var rect = deck.getBoundingClientRect();
+  if (e.clientX - rect.left > rect.width / 2) show(cur + 1);
+  else show(cur - 1);
+});
+
+try {
+  var saved = localStorage.getItem('gmq-obsv2-slide');
+  if (saved !== null) cur = parseInt(saved, 10);
+} catch(e) {}
+show(cur);
+scaleDeck();
+window.addEventListener('resize', scaleDeck);
+</script>
+
+</body>
+</html>
