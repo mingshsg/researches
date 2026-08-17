@@ -1,0 +1,10 @@
+{
+  "settings": {
+    "index.mode": "logsdb",
+    "index.mapping.source.mode": "disabled",
+    "index.codec": "best_compression",
+    "index.number_of_shards": 1,
+    "index.number_of_replicas": 0,
+    "index.refresh_interval": "-1"
+  }
+}

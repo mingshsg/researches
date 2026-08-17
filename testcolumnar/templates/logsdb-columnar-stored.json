@@ -1,0 +1,10 @@
+{
+  "settings": {
+    "index.mode": "logsdb_columnar",
+    "index.mapping.source.mode": "columnar_stored",
+    "index.codec": "best_compression",
+    "index.number_of_shards": 1,
+    "index.number_of_replicas": 0,
+    "index.refresh_interval": "-1"
+  }
+}

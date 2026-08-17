@@ -1,0 +1,14 @@
+{
+  "B": {
+    "ok": false,
+    "reason": "_source can not be disabled in index using [logsdb] index mode"
+  },
+  "D": {
+    "ok": false,
+    "reason": "unsupported source mode [DISABLED] for index mode [logsdb_columnar]; supported values: [SYNTHETIC, COLUMNAR_STORED]"
+  },
+  "A": {"ok": true, "mode": "logsdb", "source_mode": "stored", "message": "text"},
+  "C": {"ok": true, "mode": "logsdb_columnar", "source_mode": "columnar_stored", "message": "text"},
+  "F": {"ok": true, "mode": "standard", "source_mode": "stored", "message": "text"},
+  "G": {"ok": true, "mode": "standard", "source_mode": "disabled", "message": "text"}
+}

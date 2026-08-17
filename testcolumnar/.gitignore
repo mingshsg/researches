@@ -1,0 +1,10 @@
+.env
+data/
+results/*-disk.json
+results/*-queries.json
+results/ingest*.log
+results/run-summary.json
+results/scenario-*.json
+__pycache__/
+*.pyc
+.cursor/

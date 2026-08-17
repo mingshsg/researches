@@ -1,0 +1,11 @@
+{
+  "settings": {
+    "index.mode": "logsdb_columnar",
+    "index.mapping.source.mode": "synthetic",
+    "index.logsdb.default_sort_on_message_template": true,
+    "index.codec": "best_compression",
+    "index.number_of_shards": 1,
+    "index.number_of_replicas": 0,
+    "index.refresh_interval": "-1"
+  }
+}
